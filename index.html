@@ -170,6 +170,7 @@
                         <input type="text" id="subscriptionName" placeholder="Subscription Name (e.g., Netflix)" class="p-2 border rounded-md" required>
                         <input type="number" step="0.01" id="subscriptionAmount" placeholder="Monthly Cost" class="p-2 border rounded-md" required>
                         <input type="date" id="subscriptionStartDate" class="p-2 border rounded-md" required>
+                        <select id="subscriptionPaymentMethod" class="p-2 border rounded-md"></select>
                         <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Subscription</button>
                     </form>
                     <div class="mt-6">
@@ -181,6 +182,7 @@
                                         <th class="py-2 px-4 text-left">Name</th>
                                         <th class="py-2 px-4 text-right">Amount</th>
                                         <th class="py-2 px-4 text-left">Start Date</th>
+                                        <th class="py-2 px-4 text-left">Payment Method</th>
                                         <th class="py-2 px-4 text-left">Status</th>
                                         <th class="py-2 px-4 text-center">Actions</th>
                                     </tr>
@@ -196,6 +198,7 @@
             <div id="budgetsView" class="view hidden">
                 <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                     <h2 class="text-2xl font-bold mb-4">Budget Summary</h2>
+                    <div id="budgetPaymentMethodSummary" class="mb-4 border-b pb-4"></div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                         <div class="p-4 bg-green-100 rounded-lg">
                             <p class="text-sm text-green-800">Recurring Income</p>
@@ -218,6 +221,7 @@
                         <select id="budgetCategory" class="p-2 border rounded-md"></select>
                         <select id="budgetSubcategory" class="p-2 border rounded-md"></select>
                         <input type="number" step="0.01" id="budgetAmount" placeholder="Budgeted Amount" class="p-2 border rounded-md" required>
+                        <select id="budgetPaymentMethod" class="p-2 border rounded-md"></select>
                         <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Set/Update Budget</button>
                     </form>
                     <div class="mt-6">
@@ -228,6 +232,7 @@
                                     <tr>
                                         <th class="py-2 px-4 text-left">Category</th>
                                         <th class="py-2 px-4 text-left">Subcategory</th>
+                                        <th class="py-2 px-4 text-left">Payment Method</th>
                                         <th class="py-2 px-4 text-right">Amount</th>
                                         <th class="py-2 px-4 text-center">Actions</th>
                                     </tr>
@@ -553,6 +558,7 @@
                     name: document.getElementById('subscriptionName').value,
                     amount: parseFloat(document.getElementById('subscriptionAmount').value),
                     startDate: document.getElementById('subscriptionStartDate').value,
+                    paymentMethod: document.getElementById('subscriptionPaymentMethod').value,
                     status: 'active'
                 };
                 const id = document.getElementById('subscriptionId').value;
@@ -573,7 +579,8 @@
                 const budgetData = {
                     category: document.getElementById('budgetCategory').value,
                     subcategory: document.getElementById('budgetSubcategory').value,
-                    amount: parseFloat(document.getElementById('budgetAmount').value)
+                    amount: parseFloat(document.getElementById('budgetAmount').value),
+                    paymentMethod: document.getElementById('budgetPaymentMethod').value
                 };
                 const id = document.getElementById('budgetId').value;
                 if(id){
@@ -752,6 +759,7 @@
                     <td class="border px-4 py-2">${sub.name}</td>
                     <td class="border px-4 py-2 text-right">$${sub.amount.toFixed(2)}</td>
                     <td class="border px-4 py-2">${sub.startDate}</td>
+                    <td class="border px-4 py-2">${sub.paymentMethod || 'N/A'}</td>
                     <td class="border px-4 py-2">${sub.status}</td>
                     <td class="border px-4 py-2 text-center">
                          <button onclick="toggleSubscriptionStatus(${sub.id}, '${sub.status}')" class="text-yellow-500 hover:underline">${sub.status === 'active' ? 'Cancel' : 'Reactivate'}</button>
@@ -774,6 +782,7 @@
                 document.getElementById('subscriptionName').value = sub.name;
                 document.getElementById('subscriptionAmount').value = sub.amount;
                 document.getElementById('subscriptionStartDate').value = sub.startDate;
+                document.getElementById('subscriptionPaymentMethod').value = sub.paymentMethod;
             };
         }
         
@@ -811,6 +820,7 @@
                 row.innerHTML = `
                     <td class="border px-4 py-2">${budget.category}</td>
                     <td class="border px-4 py-2">${budget.subcategory}</td>
+                    <td class="border px-4 py-2">${budget.paymentMethod || 'Any'}</td>
                     <td class="border px-4 py-2 text-right">$${budget.amount.toFixed(2)}</td>
                     <td class="border px-4 py-2 text-center">
                         <button onclick="editBudget(${budget.id})" class="text-blue-500 hover:underline">Edit</button>
@@ -829,6 +839,7 @@
                 row.innerHTML = `
                     <td class="border px-4 py-2 font-semibold">Subscriptions</td>
                     <td class="border px-4 py-2">Recurring</td>
+                    <td class="border px-4 py-2">Various</td>
                     <td class="border px-4 py-2 text-right">$${totalSubscriptionCost.toFixed(2)}</td>
                     <td class="border px-4 py-2 text-center text-sm text-gray-500">Auto</td>
                 `;
@@ -846,6 +857,7 @@
                 document.getElementById('budgetCategory').value = budget.category;
                 handleCategoryChangeForEdit(budget.category, budget.subcategory, 'budgetSubcategory');
                 document.getElementById('budgetAmount').value = budget.amount;
+                document.getElementById('budgetPaymentMethod').value = budget.paymentMethod;
             };
         }
 
@@ -860,9 +872,17 @@
         async function loadPaymentMethods() {
             const methods = await getAllObjects('paymentMethods');
             const list = document.getElementById('paymentMethodList');
-            const expensePaymentTypeSelect = document.getElementById('expensePaymentType');
+            const selects = [
+                document.getElementById('expensePaymentType'),
+                document.getElementById('budgetPaymentMethod'),
+                document.getElementById('subscriptionPaymentMethod')
+            ];
             list.innerHTML = '';
-            expensePaymentTypeSelect.innerHTML = '<option value="">Select Payment Type</option>';
+            
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Select Method</option>';
+            });
+
             methods.forEach(method => {
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center p-2 border-b';
@@ -878,7 +898,7 @@
                 const option = document.createElement('option');
                 option.value = method.name;
                 option.textContent = method.name;
-                expensePaymentTypeSelect.appendChild(option);
+                selects.forEach(select => select.appendChild(option.cloneNode(true)));
             });
         }
 
@@ -1064,9 +1084,8 @@
             const allSubscriptions = await getAllObjects('subscriptions');
 
             const userBudgeted = allBudgets.reduce((sum, b) => sum + b.amount, 0);
-            const subscriptionCosts = allSubscriptions
-                .filter(s => s.status === 'active')
-                .reduce((sum, s) => sum + s.amount, 0);
+            const activeSubscriptions = allSubscriptions.filter(s => s.status === 'active');
+            const subscriptionCosts = activeSubscriptions.reduce((sum, s) => sum + s.amount, 0);
             
             const totalBudgeted = userBudgeted + subscriptionCosts;
 
@@ -1097,6 +1116,29 @@
                 remainingEl.classList.add('text-red-600');
                 remainingContainer.parentElement.querySelector('.text-sm').classList.add('text-red-800');
             }
+
+            // Payment Method Summary
+            const paymentTotals = {};
+            allBudgets.forEach(b => {
+                const method = b.paymentMethod || 'Unassigned';
+                paymentTotals[method] = (paymentTotals[method] || 0) + b.amount;
+            });
+            activeSubscriptions.forEach(s => {
+                const method = s.paymentMethod || 'Unassigned';
+                paymentTotals[method] = (paymentTotals[method] || 0) + s.amount;
+            });
+
+            const summaryEl = document.getElementById('budgetPaymentMethodSummary');
+            summaryEl.innerHTML = '<h3 class="text-xl font-semibold mb-2">Budgeted by Payment Method</h3>';
+            const list = document.createElement('div');
+            list.className = 'grid grid-cols-2 md:grid-cols-4 gap-2 text-sm';
+            for (const method in paymentTotals) {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-100 p-2 rounded-md';
+                item.innerHTML = `<p class="font-semibold">${method}</p><p>$${paymentTotals[method].toFixed(2)}</p>`;
+                list.appendChild(item);
+            }
+            summaryEl.appendChild(list);
         }
 
         async function generateReports() {
