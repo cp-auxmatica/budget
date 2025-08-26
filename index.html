@@ -134,6 +134,10 @@
                         <select id="expensePaymentType" class="p-2 border rounded-md"></select>
                         <input type="number" step="0.01" id="expenseAmount" placeholder="Amount" class="p-2 border rounded-md" required>
                         <input type="date" id="expenseDate" class="p-2 border rounded-md" required>
+                        <div class="md:col-span-2 flex items-center gap-2">
+                           <input type="checkbox" id="itemizeExpense" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                           <label for="itemizeExpense">Itemize this expense</label>
+                        </div>
                         <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Expense</button>
                     </form>
                     <div class="mt-6">
@@ -344,6 +348,38 @@
         </div>
     </div>
 
+    <!-- Itemization Modal -->
+    <div id="itemizationModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-4">
+            <h3 id="itemizationModalTitle" class="text-xl font-bold mb-2">Itemize Expense</h3>
+            <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                <div class="p-2 bg-gray-100 rounded">
+                    <p class="text-sm">Total Amount</p>
+                    <p id="itemizationTotal" class="font-bold text-lg">$0.00</p>
+                </div>
+                <div class="p-2 bg-gray-100 rounded">
+                    <p class="text-sm">Remaining</p>
+                    <p id="itemizationRemaining" class="font-bold text-lg">$0.00</p>
+                </div>
+            </div>
+            <form id="itemizationForm" class="flex gap-2 mb-4">
+                <input type="hidden" id="itemizationExpenseId">
+                <input type="text" id="itemName" placeholder="Item Name" class="flex-grow p-2 border rounded-md" required>
+                <input type="number" step="0.01" id="itemAmount" placeholder="Amount" class="w-32 p-2 border rounded-md" required>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Add</button>
+            </form>
+            <div class="max-h-64 overflow-y-auto border rounded-md">
+                <ul id="itemizedList" class="divide-y">
+                    <!-- Items will be listed here -->
+                </ul>
+            </div>
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="itemizationDone" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Done</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- DATABASE SETUP ---
         const DB_NAME = 'HomeBudgetDB';
@@ -405,6 +441,16 @@
             });
         }
         
+        function getObject(storeName, id) {
+             return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.get(id);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = (event) => reject('Error getting object:', event.target.error);
+            });
+        }
+
         function getAllObjects(storeName) {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction([storeName], 'readonly');
@@ -530,23 +576,30 @@
             // Expense Form
             document.getElementById('expenseForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const shouldItemize = document.getElementById('itemizeExpense').checked;
                 const expenseData = {
                     payee: document.getElementById('expensePayee').value,
                     category: document.getElementById('expenseCategory').value,
                     subcategory: document.getElementById('expenseSubcategory').value,
                     paymentType: document.getElementById('expensePaymentType').value,
                     amount: parseFloat(document.getElementById('expenseAmount').value),
-                    date: document.getElementById('expenseDate').value
+                    date: document.getElementById('expenseDate').value,
+                    items: []
                 };
                  const id = document.getElementById('expenseId').value;
                 if (id) {
                     expenseData.id = parseInt(id);
+                    const existingExpense = await getObject('expenses', expenseData.id);
+                    expenseData.items = existingExpense.items || []; // Preserve existing items on update
                     await updateObject('expenses', expenseData);
+                    if (shouldItemize) openItemizationModal(id);
                 } else {
-                    await addObject('expenses', expenseData);
+                    const newId = await addObject('expenses', expenseData);
+                    if (shouldItemize) openItemizationModal(newId);
                 }
                 e.target.reset();
                 document.getElementById('expenseId').value = '';
+                document.getElementById('itemizeExpense').checked = false;
                 loadExpenses();
                 updateDashboard();
             });
@@ -704,16 +757,20 @@
             list.innerHTML = '';
             expenses.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(expense => {
                 const row = list.insertRow();
+                let actionsHTML = `
+                    <button onclick="editExpense(${expense.id})" class="text-blue-500 hover:underline">Edit</button>
+                    <button onclick="deleteExpense(${expense.id})" class="text-red-500 hover:underline ml-2">Delete</button>
+                `;
+                if (expense.items && expense.items.length > 0) {
+                    actionsHTML = `<button onclick="openItemizationModal(${expense.id})" class="text-green-500 hover:underline">View Items</button> ` + actionsHTML;
+                }
                 row.innerHTML = `
                     <td class="border px-4 py-2">${expense.payee}</td>
                     <td class="border px-4 py-2">${expense.category} / ${expense.subcategory}</td>
                     <td class="border px-4 py-2">${expense.paymentType}</td>
                     <td class="border px-4 py-2 text-right">$${expense.amount.toFixed(2)}</td>
                     <td class="border px-4 py-2">${expense.date}</td>
-                    <td class="border px-4 py-2 text-center">
-                        <button onclick="editExpense(${expense.id})" class="text-blue-500 hover:underline">Edit</button>
-                        <button onclick="deleteExpense(${expense.id})" class="text-red-500 hover:underline ml-2">Delete</button>
-                    </td>
+                    <td class="border px-4 py-2 text-center">${actionsHTML}</td>
                 `;
             });
             await renderExpenseCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
@@ -1442,6 +1499,85 @@
         function closeModal() {
             document.getElementById('confirmationModal').classList.remove('active');
         }
+
+        // --- ITEMIZATION LOGIC ---
+        async function openItemizationModal(expenseId) {
+            const modal = document.getElementById('itemizationModal');
+            document.getElementById('itemizationExpenseId').value = expenseId;
+            
+            const expense = await getObject('expenses', expenseId);
+            if (!expense) return;
+
+            document.getElementById('itemizationModalTitle').textContent = `Itemize: ${expense.payee}`;
+            document.getElementById('itemizationTotal').textContent = `$${expense.amount.toFixed(2)}`;
+            
+            await renderItemizedList(expense);
+
+            modal.classList.add('active');
+        }
+
+        async function renderItemizedList(expense) {
+            const listEl = document.getElementById('itemizedList');
+            listEl.innerHTML = '';
+            let itemizedTotal = 0;
+
+            if (expense.items && expense.items.length > 0) {
+                expense.items.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center p-2';
+                    li.innerHTML = `
+                        <span>${item.name}</span>
+                        <div>
+                            <span class="font-medium mr-4">$${item.amount.toFixed(2)}</span>
+                            <button onclick="deleteItemizedEntry(${expense.id}, ${index})" class="text-red-500 hover:underline">x</button>
+                        </div>
+                    `;
+                    listEl.appendChild(li);
+                    itemizedTotal += item.amount;
+                });
+            }
+            
+            const remaining = expense.amount - itemizedTotal;
+            const remainingEl = document.getElementById('itemizationRemaining');
+            remainingEl.textContent = `$${remaining.toFixed(2)}`;
+            remainingEl.className = 'font-bold text-lg ';
+            remainingEl.classList.add(remaining < 0 ? 'text-red-500' : 'text-green-600');
+        }
+
+        document.getElementById('itemizationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const expenseId = parseInt(document.getElementById('itemizationExpenseId').value);
+            const itemName = document.getElementById('itemName').value;
+            const itemAmount = parseFloat(document.getElementById('itemAmount').value);
+
+            const expense = await getObject('expenses', expenseId);
+            if (!expense) return;
+
+            if (!expense.items) {
+                expense.items = [];
+            }
+            expense.items.push({ name: itemName, amount: itemAmount });
+
+            await updateObject('expenses', expense);
+            await renderItemizedList(expense);
+            await loadExpenses(); // To update the "View Items" button
+            e.target.reset();
+        });
+
+        async function deleteItemizedEntry(expenseId, itemIndex) {
+            const expense = await getObject('expenses', expenseId);
+            if (!expense || !expense.items) return;
+
+            expense.items.splice(itemIndex, 1);
+            await updateObject('expenses', expense);
+            await renderItemizedList(expense);
+            await loadExpenses();
+        }
+
+        document.getElementById('itemizationDone').addEventListener('click', () => {
+            document.getElementById('itemizationModal').classList.remove('active');
+        });
+
 
         // --- DATA MANAGEMENT ---
         async function exportData() {
