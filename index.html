@@ -801,8 +801,11 @@
 
         async function loadBudgets() {
             const budgets = await getAllObjects('budgets');
+            const subscriptions = await getAllObjects('subscriptions');
             const list = document.getElementById('budgetList');
             list.innerHTML = '';
+
+            // Render user-defined budgets
             budgets.forEach(budget => {
                 const row = list.insertRow();
                 row.innerHTML = `
@@ -815,6 +818,21 @@
                     </td>
                 `;
             });
+
+            // Render subscriptions as a line item
+            const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
+            const totalSubscriptionCost = activeSubscriptions.reduce((sum, s) => sum + s.amount, 0);
+
+            if (totalSubscriptionCost > 0) {
+                const row = list.insertRow();
+                row.className = 'bg-blue-50'; // Add a distinct style
+                row.innerHTML = `
+                    <td class="border px-4 py-2 font-semibold">Subscriptions</td>
+                    <td class="border px-4 py-2">Recurring</td>
+                    <td class="border px-4 py-2 text-right">$${totalSubscriptionCost.toFixed(2)}</td>
+                    <td class="border px-4 py-2 text-center text-sm text-gray-500">Auto</td>
+                `;
+            }
             await updateBudgetSummary();
         }
         
