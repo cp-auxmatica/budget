@@ -160,6 +160,10 @@
             <!-- Subscriptions View -->
             <div id="subscriptionsView" class="view hidden">
                  <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-blue-800">Total Monthly Subscription Cost</h3>
+                        <p id="totalSubscriptionCost" class="text-3xl font-bold text-blue-600">$0.00</p>
+                    </div>
                     <h2 class="text-2xl font-bold mb-4">Manage Subscriptions</h2>
                     <form id="subscriptionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="hidden" id="subscriptionId">
@@ -737,6 +741,11 @@
             const subscriptions = await getAllObjects('subscriptions');
             const list = document.getElementById('subscriptionList');
             list.innerHTML = '';
+            
+            const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
+            const totalCost = activeSubscriptions.reduce((sum, s) => sum + s.amount, 0);
+            document.getElementById('totalSubscriptionCost').textContent = `$${totalCost.toFixed(2)}`;
+
             subscriptions.forEach(sub => {
                 const row = list.insertRow();
                 row.innerHTML = `
@@ -752,6 +761,7 @@
                 `;
             });
             await renderExpenseCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
+            await updateBudgetSummary();
         }
         
         async function editSubscription(id) {
@@ -1033,8 +1043,15 @@
         async function updateBudgetSummary() {
             const allBudgets = await getAllObjects('budgets');
             const allIncome = await getAllObjects('income');
+            const allSubscriptions = await getAllObjects('subscriptions');
 
-            const totalBudgeted = allBudgets.reduce((sum, b) => sum + b.amount, 0);
+            const userBudgeted = allBudgets.reduce((sum, b) => sum + b.amount, 0);
+            const subscriptionCosts = allSubscriptions
+                .filter(s => s.status === 'active')
+                .reduce((sum, s) => sum + s.amount, 0);
+            
+            const totalBudgeted = userBudgeted + subscriptionCosts;
+
             const recurringIncome = allIncome
                 .filter(i => i.type === 'recurring')
                 .reduce((sum, i) => sum + i.amount, 0);
