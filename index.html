@@ -30,305 +30,312 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+        #sidebar.translate-x-0 {
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-        <header class="mb-8 text-center">
-            <h1 class="text-4xl font-bold text-gray-900">Home Budget Dashboard</h1>
-            <p class="text-lg text-gray-600 mt-2">Your personal finance manager</p>
-        </header>
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-gray-800 text-white p-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30">
+            <h2 class="text-2xl font-bold mb-6">Home Budget</h2>
+            <nav id="mainNav">
+                <a href="#" onclick="showView('dashboardView', this)" class="nav-link active-nav flex items-center px-4 py-2 rounded-md hover:bg-gray-700">Dashboard</a>
+                <a href="#" onclick="showView('incomeView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Income</a>
+                <a href="#" onclick="showView('expensesView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Expenses</a>
+                <a href="#" onclick="showView('subscriptionsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Subscriptions</a>
+                <a href="#" onclick="showView('budgetsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Budgets</a>
+                <a href="#" onclick="showView('reportsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Reports</a>
+                <a href="#" onclick="showView('settingsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Settings</a>
+            </nav>
+        </aside>
 
-        <!-- Main Navigation -->
-        <nav class="bg-white rounded-lg shadow-md p-4 mb-8 flex flex-wrap justify-center gap-4">
-            <button onclick="showView('dashboardView')" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Dashboard</button>
-            <button onclick="showView('incomeView')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300">Income</button>
-            <button onclick="showView('expensesView')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300">Expenses</button>
-            <button onclick="showView('subscriptionsView')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300">Subscriptions</button>
-            <button onclick="showView('budgetsView')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300">Budgets</button>
-            <button onclick="showView('reportsView')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300">Reports</button>
-            <button onclick="showView('settingsView')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-300">Settings</button>
-        </nav>
-
-        <main id="app">
-            <!-- Dashboard View -->
-            <div id="dashboardView" class="view">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-2">Monthly Summary</h3>
-                        <p>Total Income: <span id="summaryIncome" class="font-bold text-green-600">$0.00</span></p>
-                        <p>Total Expenses: <span id="summaryExpenses" class="font-bold text-red-600">$0.00</span></p>
-                        <p>Net Balance: <span id="summaryBalance" class="font-bold text-blue-600">$0.00</span></p>
-                    </div>
-                     <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-2">Upcoming Birthdays</h3>
-                        <ul id="upcomingBirthdays" class="list-disc list-inside"></ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Income View -->
-            <div id="incomeView" class="view hidden">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-4">Manage Income</h2>
-                    <form id="incomeForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                        <input type="hidden" id="incomeId">
-                        <input type="text" id="incomeName" placeholder="Name (e.g., Salary)" class="p-2 border rounded-md" required>
-                        <input type="text" id="incomeSource" placeholder="Source (e.g., Employer)" class="p-2 border rounded-md" required>
-                        <select id="incomeType" class="p-2 border rounded-md">
-                            <option value="recurring">Recurring</option>
-                            <option value="one-time">One-Time</option>
-                        </select>
-                        <input type="number" step="0.01" id="incomeAmount" placeholder="Amount" class="p-2 border rounded-md" required>
-                        <div class="md:col-span-2">
-                            <input type="date" id="incomeDate" class="p-2 border rounded-md w-full hidden">
-                        </div>
-                        <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Add/Update Income</button>
-                    </form>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold mb-2">Income List</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full bg-white">
-                                <thead class="bg-gray-200">
-                                    <tr>
-                                        <th class="py-2 px-4 text-left">Name</th>
-                                        <th class="py-2 px-4 text-left">Source</th>
-                                        <th class="py-2 px-4 text-left">Type</th>
-                                        <th class="py-2 px-4 text-right">Amount</th>
-                                        <th class="py-2 px-4 text-left">Date</th>
-                                        <th class="py-2 px-4 text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="incomeList"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Expenses View -->
-            <div id="expensesView" class="view hidden">
-                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 class="text-2xl font-bold mb-4">Expense Calendar</h2>
-                    <div class="flex items-center justify-between mb-4">
-                        <button id="prevMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&lt;</button>
-                        <h3 id="calendarHeader" class="text-xl font-semibold"></h3>
-                        <button id="nextMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&gt;</button>
-                    </div>
-                    <div class="grid grid-cols-7 gap-1 text-center font-semibold mb-2">
-                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                    </div>
-                    <div id="calendarGrid" class="grid grid-cols-7 gap-1">
-                        <!-- Calendar days will be generated here -->
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-4">Track Expenses</h2>
-                    <form id="expenseForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="hidden" id="expenseId">
-                        <input type="text" id="expensePayee" placeholder="Payee/Store" class="p-2 border rounded-md" required>
-                        <select id="expenseCategory" class="p-2 border rounded-md"></select>
-                        <select id="expenseSubcategory" class="p-2 border rounded-md"></select>
-                        <select id="expensePaymentType" class="p-2 border rounded-md"></select>
-                        <input type="number" step="0.01" id="expenseAmount" placeholder="Amount" class="p-2 border rounded-md" required>
-                        <input type="date" id="expenseDate" class="p-2 border rounded-md" required>
-                        <div class="md:col-span-2 flex items-center gap-2">
-                           <input type="checkbox" id="itemizeExpense" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                           <label for="itemizeExpense">Itemize this expense</label>
-                        </div>
-                        <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Expense</button>
-                    </form>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold mb-2">Recent Expenses</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full bg-white">
-                                <thead class="bg-gray-200">
-                                    <tr>
-                                        <th class="py-2 px-4 text-left">Payee</th>
-                                        <th class="py-2 px-4 text-left">Category</th>
-                                        <th class="py-2 px-4 text-left">Payment Type</th>
-                                        <th class="py-2 px-4 text-right">Amount</th>
-                                        <th class="py-2 px-4 text-left">Date</th>
-                                        <th class="py-2 px-4 text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="expenseList"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow-md p-4 flex items-center justify-between">
+                <button id="hamburger" class="md:hidden text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <h1 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h1>
+            </header>
             
-            <!-- Subscriptions View -->
-            <div id="subscriptionsView" class="view hidden">
-                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="mb-6 bg-blue-50 p-4 rounded-lg">
-                        <h3 class="text-lg font-semibold text-blue-800">Total Monthly Subscription Cost</h3>
-                        <p id="totalSubscriptionCost" class="text-3xl font-bold text-blue-600">$0.00</p>
-                    </div>
-                    <h2 class="text-2xl font-bold mb-4">Manage Subscriptions</h2>
-                    <form id="subscriptionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="hidden" id="subscriptionId">
-                        <input type="text" id="subscriptionName" placeholder="Subscription Name (e.g., Netflix)" class="p-2 border rounded-md" required>
-                        <input type="number" step="0.01" id="subscriptionAmount" placeholder="Monthly Cost" class="p-2 border rounded-md" required>
-                        <input type="date" id="subscriptionStartDate" class="p-2 border rounded-md" required>
-                        <select id="subscriptionPaymentMethod" class="p-2 border rounded-md"></select>
-                        <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Subscription</button>
-                    </form>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold mb-2">Active Subscriptions</h3>
-                        <div class="overflow-x-auto">
-                           <table class="min-w-full bg-white">
-                                <thead class="bg-gray-200">
-                                    <tr>
-                                        <th class="py-2 px-4 text-left">Name</th>
-                                        <th class="py-2 px-4 text-right">Amount</th>
-                                        <th class="py-2 px-4 text-left">Start Date</th>
-                                        <th class="py-2 px-4 text-left">Payment Method</th>
-                                        <th class="py-2 px-4 text-left">Status</th>
-                                        <th class="py-2 px-4 text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="subscriptionList"></tbody>
-                            </table>
+            <main id="app" class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 sm:p-6 lg:p-8">
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-2">Monthly Summary</h3>
+                            <p>Total Income: <span id="summaryIncome" class="font-bold text-green-600">$0.00</span></p>
+                            <p>Total Expenses: <span id="summaryExpenses" class="font-bold text-red-600">$0.00</span></p>
+                            <p>Net Balance: <span id="summaryBalance" class="font-bold text-blue-600">$0.00</span></p>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-2">Upcoming Birthdays</h3>
+                            <ul id="upcomingBirthdays" class="list-disc list-inside"></ul>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Budgets View -->
-            <div id="budgetsView" class="view hidden">
-                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 class="text-2xl font-bold mb-4">Budget Summary</h2>
-                    <div id="budgetPaymentMethodSummary" class="mb-4 border-b pb-4"></div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                        <div class="p-4 bg-green-100 rounded-lg">
-                            <p class="text-sm text-green-800">Recurring Income</p>
-                            <p id="summaryRecurringIncome" class="text-2xl font-bold text-green-600">$0.00</p>
-                        </div>
-                        <div class="p-4 bg-red-100 rounded-lg">
-                            <p class="text-sm text-red-800">Total Budgeted</p>
-                            <p id="summaryTotalBudgeted" class="text-2xl font-bold text-red-600">$0.00</p>
-                        </div>
-                        <div class="p-4 rounded-lg bg-blue-100">
-                            <p class="text-sm text-blue-800">Remaining</p>
-                            <p id="summaryBudgetRemaining" class="text-2xl font-bold text-blue-600">$0.00</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-4">Set Budgets</h2>
-                     <form id="budgetForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="hidden" id="budgetId">
-                        <select id="budgetCategory" class="p-2 border rounded-md"></select>
-                        <select id="budgetSubcategory" class="p-2 border rounded-md"></select>
-                        <input type="number" step="0.01" id="budgetAmount" placeholder="Budgeted Amount" class="p-2 border rounded-md" required>
-                        <select id="budgetPaymentMethod" class="p-2 border rounded-md"></select>
-                        <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Set/Update Budget</button>
-                    </form>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-semibold mb-2">Current Budgets</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full bg-white">
-                                <thead class="bg-gray-200">
-                                    <tr>
-                                        <th class="py-2 px-4 text-left">Category</th>
-                                        <th class="py-2 px-4 text-left">Subcategory</th>
-                                        <th class="py-2 px-4 text-left">Payment Method</th>
-                                        <th class="py-2 px-4 text-right">Amount</th>
-                                        <th class="py-2 px-4 text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="budgetList"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reports View -->
-            <div id="reportsView" class="view hidden">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold mb-4">Monthly Reports</h2>
-                    <div class="mb-4">
-                        <label for="reportMonth" class="mr-2">Select Month:</label>
-                        <input type="month" id="reportMonth" class="p-2 border rounded-md">
-                    </div>
-                    <div class="space-y-6">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2 border-b pb-2">Monthly Overview</h3>
-                            <div id="incomeExpenseReport"></div>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2 border-b pb-2">Budget vs. Actual</h3>
-                            <div id="budgetActualReport" class="overflow-x-auto"></div>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mt-4 mb-2 border-b pb-2">Spend by Category</h3>
-                            <div id="categorySpendReport"></div>
-                        </div>
-                        <div>
-                           <h3 class="text-xl font-semibold mt-4 mb-2 border-b pb-2">Spend by Payment Type</h3>
-                           <div id="paymentTypeSpendReport"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings View -->
-            <div id="settingsView" class="view hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Payment Methods -->
+                <!-- Income View -->
+                <div id="incomeView" class="view hidden">
                     <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">Payment Methods</h3>
-                        <form id="paymentMethodForm">
-                            <input type="hidden" id="paymentMethodId">
-                            <input type="text" id="paymentMethodName" placeholder="Name (e.g., Chase Sapphire)" class="p-2 border rounded-md w-full mb-2" required>
-                            <select id="paymentMethodType" class="p-2 border rounded-md w-full mb-2">
-                                <option value="Credit Card">Credit Card</option>
-                                <option value="Bank Account">Bank Account</option>
+                        <h2 class="text-2xl font-bold mb-4">Manage Income</h2>
+                        <form id="incomeForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                            <input type="hidden" id="incomeId">
+                            <input type="text" id="incomeName" placeholder="Name (e.g., Salary)" class="p-2 border rounded-md" required>
+                            <input type="text" id="incomeSource" placeholder="Source (e.g., Employer)" class="p-2 border rounded-md" required>
+                            <select id="incomeType" class="p-2 border rounded-md">
+                                <option value="recurring">Recurring</option>
+                                <option value="one-time">One-Time</option>
                             </select>
-                            <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Method</button>
+                            <input type="number" step="0.01" id="incomeAmount" placeholder="Amount" class="p-2 border rounded-md" required>
+                            <div class="md:col-span-2">
+                                <input type="date" id="incomeDate" class="p-2 border rounded-md w-full hidden">
+                            </div>
+                            <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Add/Update Income</button>
                         </form>
-                        <ul id="paymentMethodList" class="mt-4"></ul>
-                    </div>
-                    <!-- Expense Categories -->
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">Expense Categories</h3>
-                        <form id="categoryForm">
-                             <input type="text" id="categoryName" placeholder="Main Category Name" class="p-2 border rounded-md w-full mb-2" required>
-                            <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Category</button>
-                        </form>
-                        <div id="categoryList" class="mt-4"></div>
-                    </div>
-                    <!-- People & Birthdays -->
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">People & Birthdays</h3>
-                        <form id="personForm">
-                            <input type="hidden" id="personId">
-                            <input type="text" id="personName" placeholder="Person's Name" class="p-2 border rounded-md w-full mb-2" required>
-                            <input type="date" id="personBirthday" class="p-2 border rounded-md w-full mb-2" required>
-                            <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Person</button>
-                        </form>
-                        <ul id="peopleList" class="mt-4"></ul>
-                    </div>
-                    <!-- Data Management -->
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">Data Management</h3>
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <button id="exportButton" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Export Data</button>
-                            <label class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 cursor-pointer text-center">
-                                Import Data
-                                <input type="file" id="importFile" class="hidden" accept=".json">
-                            </label>
+                        <div class="mt-6">
+                            <h3 class="text-xl font-semibold mb-2">Income List</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white">
+                                    <thead class="bg-gray-200">
+                                        <tr>
+                                            <th class="py-2 px-4 text-left">Name</th>
+                                            <th class="py-2 px-4 text-left">Source</th>
+                                            <th class="py-2 px-4 text-left">Type</th>
+                                            <th class="py-2 px-4 text-right">Amount</th>
+                                            <th class="py-2 px-4 text-left">Date</th>
+                                            <th class="py-2 px-4 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="incomeList"></tbody>
+                                </table>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-600 mt-2">Note: Importing data will overwrite all existing data in the application.</p>
                     </div>
                 </div>
-            </div>
-        </main>
+
+                <!-- Expenses View -->
+                <div id="expensesView" class="view hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <h2 class="text-2xl font-bold mb-4">Expense Calendar</h2>
+                        <div class="flex items-center justify-between mb-4">
+                            <button id="prevMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&lt;</button>
+                            <h3 id="calendarHeader" class="text-xl font-semibold"></h3>
+                            <button id="nextMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&gt;</button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1 text-center font-semibold mb-2">
+                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                        </div>
+                        <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+                            <!-- Calendar days will be generated here -->
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-bold mb-4">Track Expenses</h2>
+                        <form id="expenseForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="hidden" id="expenseId">
+                            <input type="text" id="expensePayee" placeholder="Payee/Store" class="p-2 border rounded-md" required>
+                            <select id="expenseCategory" class="p-2 border rounded-md"></select>
+                            <select id="expenseSubcategory" class="p-2 border rounded-md"></select>
+                            <select id="expensePaymentType" class="p-2 border rounded-md"></select>
+                            <input type="number" step="0.01" id="expenseAmount" placeholder="Amount" class="p-2 border rounded-md" required>
+                            <input type="date" id="expenseDate" class="p-2 border rounded-md" required>
+                            <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Expense</button>
+                        </form>
+                        <div class="mt-6">
+                            <h3 class="text-xl font-semibold mb-2">Recent Expenses</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white">
+                                    <thead class="bg-gray-200">
+                                        <tr>
+                                            <th class="py-2 px-4 text-left">Payee</th>
+                                            <th class="py-2 px-4 text-left">Category</th>
+                                            <th class="py-2 px-4 text-left">Payment Type</th>
+                                            <th class="py-2 px-4 text-right">Amount</th>
+                                            <th class="py-2 px-4 text-left">Date</th>
+                                            <th class="py-2 px-4 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenseList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subscriptions View -->
+                <div id="subscriptionsView" class="view hidden">
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-blue-800">Total Monthly Subscription Cost</h3>
+                            <p id="totalSubscriptionCost" class="text-3xl font-bold text-blue-600">$0.00</p>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-4">Manage Subscriptions</h2>
+                        <form id="subscriptionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="hidden" id="subscriptionId">
+                            <input type="text" id="subscriptionName" placeholder="Subscription Name (e.g., Netflix)" class="p-2 border rounded-md" required>
+                            <input type="number" step="0.01" id="subscriptionAmount" placeholder="Monthly Cost" class="p-2 border rounded-md" required>
+                            <input type="date" id="subscriptionStartDate" class="p-2 border rounded-md" required>
+                            <select id="subscriptionPaymentMethod" class="p-2 border rounded-md"></select>
+                            <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Subscription</button>
+                        </form>
+                        <div class="mt-6">
+                            <h3 class="text-xl font-semibold mb-2">Active Subscriptions</h3>
+                            <div class="overflow-x-auto">
+                               <table class="min-w-full bg-white">
+                                    <thead class="bg-gray-200">
+                                        <tr>
+                                            <th class="py-2 px-4 text-left">Name</th>
+                                            <th class="py-2 px-4 text-right">Amount</th>
+                                            <th class="py-2 px-4 text-left">Start Date</th>
+                                            <th class="py-2 px-4 text-left">Payment Method</th>
+                                            <th class="py-2 px-4 text-left">Status</th>
+                                            <th class="py-2 px-4 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subscriptionList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budgets View -->
+                <div id="budgetsView" class="view hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <h2 class="text-2xl font-bold mb-4">Budget Summary</h2>
+                        <div id="budgetPaymentMethodSummary" class="mb-4 border-b pb-4"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                            <div class="p-4 bg-green-100 rounded-lg">
+                                <p class="text-sm text-green-800">Recurring Income</p>
+                                <p id="summaryRecurringIncome" class="text-2xl font-bold text-green-600">$0.00</p>
+                            </div>
+                            <div class="p-4 bg-red-100 rounded-lg">
+                                <p class="text-sm text-red-800">Total Budgeted</p>
+                                <p id="summaryTotalBudgeted" class="text-2xl font-bold text-red-600">$0.00</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-blue-100">
+                                <p class="text-sm text-blue-800">Remaining</p>
+                                <p id="summaryBudgetRemaining" class="text-2xl font-bold text-blue-600">$0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-bold mb-4">Set Budgets</h2>
+                         <form id="budgetForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="hidden" id="budgetId">
+                            <select id="budgetCategory" class="p-2 border rounded-md"></select>
+                            <select id="budgetSubcategory" class="p-2 border rounded-md"></select>
+                            <input type="number" step="0.01" id="budgetAmount" placeholder="Budgeted Amount" class="p-2 border rounded-md" required>
+                            <select id="budgetPaymentMethod" class="p-2 border rounded-md"></select>
+                            <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Set/Update Budget</button>
+                        </form>
+                        <div class="mt-6">
+                            <h3 class="text-xl font-semibold mb-2">Current Budgets</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white">
+                                    <thead class="bg-gray-200">
+                                        <tr>
+                                            <th class="py-2 px-4 text-left">Category</th>
+                                            <th class="py-2 px-4 text-left">Subcategory</th>
+                                            <th class="py-2 px-4 text-left">Payment Method</th>
+                                            <th class="py-2 px-4 text-right">Amount</th>
+                                            <th class="py-2 px-4 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="budgetList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports View -->
+                <div id="reportsView" class="view hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-bold mb-4">Monthly Reports</h2>
+                        <div class="mb-4">
+                            <label for="reportMonth" class="mr-2">Select Month:</label>
+                            <input type="month" id="reportMonth" class="p-2 border rounded-md">
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 border-b pb-2">Monthly Overview</h3>
+                                <div id="incomeExpenseReport"></div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 border-b pb-2">Budget vs. Actual</h3>
+                                <div id="budgetActualReport" class="overflow-x-auto"></div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mt-4 mb-2 border-b pb-2">Spend by Category</h3>
+                                <div id="categorySpendReport"></div>
+                            </div>
+                            <div>
+                               <h3 class="text-xl font-semibold mt-4 mb-2 border-b pb-2">Spend by Payment Type</h3>
+                               <div id="paymentTypeSpendReport"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings View -->
+                <div id="settingsView" class="view hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Payment Methods -->
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4">Payment Methods</h3>
+                            <form id="paymentMethodForm">
+                                <input type="hidden" id="paymentMethodId">
+                                <input type="text" id="paymentMethodName" placeholder="Name (e.g., Chase Sapphire)" class="p-2 border rounded-md w-full mb-2" required>
+                                <select id="paymentMethodType" class="p-2 border rounded-md w-full mb-2">
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Bank Account">Bank Account</option>
+                                </select>
+                                <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Method</button>
+                            </form>
+                            <ul id="paymentMethodList" class="mt-4"></ul>
+                        </div>
+                        <!-- Expense Categories -->
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4">Expense Categories</h3>
+                            <form id="categoryForm">
+                                 <input type="text" id="categoryName" placeholder="Main Category Name" class="p-2 border rounded-md w-full mb-2" required>
+                                <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Category</button>
+                            </form>
+                            <div id="categoryList" class="mt-4"></div>
+                        </div>
+                        <!-- People & Birthdays -->
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4">People & Birthdays</h3>
+                            <form id="personForm">
+                                <input type="hidden" id="personId">
+                                <input type="text" id="personName" placeholder="Person's Name" class="p-2 border rounded-md w-full mb-2" required>
+                                <input type="date" id="personBirthday" class="p-2 border rounded-md w-full mb-2" required>
+                                <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Person</button>
+                            </form>
+                            <ul id="peopleList" class="mt-4"></ul>
+                        </div>
+                        <!-- Data Management -->
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4">Data Management</h3>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <button id="exportButton" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Export Data</button>
+                                <label class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 cursor-pointer text-center">
+                                    Import Data
+                                    <input type="file" id="importFile" class="hidden" accept=".json">
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Note: Importing data will overwrite all existing data in the application.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <!-- Notification Toast -->
@@ -483,11 +490,28 @@
 
 
         // --- UI LOGIC ---
-        function showView(viewId) {
+        function showView(viewId, element) {
+            // Hide all views
             document.querySelectorAll('.view').forEach(view => {
                 view.classList.add('hidden');
             });
+            // Show the selected view
             document.getElementById(viewId).classList.remove('hidden');
+
+            // Update page title
+            document.getElementById('pageTitle').textContent = element.textContent;
+
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active-nav', 'bg-blue-600');
+            });
+            element.classList.add('active-nav', 'bg-blue-600');
+
+            // Close sidebar on mobile after navigation
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
         }
 
         // --- APP INITIALIZATION ---
@@ -515,6 +539,11 @@
                 // Setup Calendar
                 setupCalendarNav();
                 renderExpenseCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
+
+                // Setup Hamburger Menu
+                document.getElementById('hamburger').addEventListener('click', () => {
+                    document.getElementById('sidebar').classList.toggle('-translate-x-full');
+                });
 
 
             } catch (error) {
@@ -576,7 +605,6 @@
             // Expense Form
             document.getElementById('expenseForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const shouldItemize = document.getElementById('itemizeExpense').checked;
                 const expenseData = {
                     payee: document.getElementById('expensePayee').value,
                     category: document.getElementById('expenseCategory').value,
@@ -584,22 +612,19 @@
                     paymentType: document.getElementById('expensePaymentType').value,
                     amount: parseFloat(document.getElementById('expenseAmount').value),
                     date: document.getElementById('expenseDate').value,
-                    items: []
+                    items: [] 
                 };
                  const id = document.getElementById('expenseId').value;
                 if (id) {
                     expenseData.id = parseInt(id);
                     const existingExpense = await getObject('expenses', expenseData.id);
-                    expenseData.items = existingExpense.items || []; // Preserve existing items on update
+                    expenseData.items = existingExpense.items || []; 
                     await updateObject('expenses', expenseData);
-                    if (shouldItemize) openItemizationModal(id);
                 } else {
-                    const newId = await addObject('expenses', expenseData);
-                    if (shouldItemize) openItemizationModal(newId);
+                    await addObject('expenses', expenseData);
                 }
                 e.target.reset();
                 document.getElementById('expenseId').value = '';
-                document.getElementById('itemizeExpense').checked = false;
                 loadExpenses();
                 updateDashboard();
             });
@@ -757,13 +782,17 @@
             list.innerHTML = '';
             expenses.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(expense => {
                 const row = list.insertRow();
+                
+                const hasItems = expense.items && expense.items.length > 0;
+                const itemizeButtonText = hasItems ? 'View Items' : 'Itemize';
+                const itemizeButtonClass = hasItems ? 'text-green-500' : 'text-blue-500';
+
                 let actionsHTML = `
-                    <button onclick="editExpense(${expense.id})" class="text-blue-500 hover:underline">Edit</button>
+                    <button onclick="openItemizationModal(${expense.id})" class="${itemizeButtonClass} hover:underline">${itemizeButtonText}</button>
+                    <button onclick="editExpense(${expense.id})" class="text-blue-500 hover:underline ml-2">Edit</button>
                     <button onclick="deleteExpense(${expense.id})" class="text-red-500 hover:underline ml-2">Delete</button>
                 `;
-                if (expense.items && expense.items.length > 0) {
-                    actionsHTML = `<button onclick="openItemizationModal(${expense.id})" class="text-green-500 hover:underline">View Items</button> ` + actionsHTML;
-                }
+                
                 row.innerHTML = `
                     <td class="border px-4 py-2">${expense.payee}</td>
                     <td class="border px-4 py-2">${expense.category} / ${expense.subcategory}</td>
