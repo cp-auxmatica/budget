@@ -256,7 +256,7 @@
 
                 <!-- Reports View -->
                 <div id="reportsView" class="view hidden">
-                    <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                         <h2 class="text-2xl font-bold mb-4">Monthly Reports</h2>
                         <div class="mb-4">
                             <label for="reportMonth" class="mr-2">Select Month:</label>
@@ -278,6 +278,32 @@
                             <div>
                                <h3 class="text-xl font-semibold mt-4 mb-2 border-b pb-2">Spend by Payment Type</h3>
                                <div id="paymentTypeSpendReport"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-bold mb-4">Yearly Reports</h2>
+                        <div class="mb-4">
+                            <label for="reportYear" class="mr-2">Select Year:</label>
+                            <input type="number" id="reportYear" class="p-2 border rounded-md w-24">
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 border-b pb-2">Spend by Category (Yearly)</h3>
+                                <div id="yearlyCategorySpendReport" class="overflow-x-auto"></div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mt-4 mb-2 border-b pb-2">Spend by Subcategory (Yearly)</h3>
+                                <div id="yearlySubcategorySpendReport" class="overflow-x-auto"></div>
+                            </div>
+                             <div>
+                                <h3 class="text-xl font-semibold mt-4 mb-2 border-b pb-2">Grocery Price Tracking</h3>
+                                <div class="mb-2">
+                                    <label for="groceryItemSelect" class="mr-2">Select Item:</label>
+                                    <select id="groceryItemSelect" class="p-2 border rounded-md"></select>
+                                </div>
+                                <div id="groceryPriceTrackerReport" class="overflow-x-auto"></div>
                             </div>
                         </div>
                     </div>
@@ -319,6 +345,15 @@
                                 <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Person</button>
                             </form>
                             <ul id="peopleList" class="mt-4"></ul>
+                        </div>
+                        <!-- Grocery Items -->
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4">Manage Grocery Items</h3>
+                            <form id="groceryItemForm">
+                                <input type="text" id="newGroceryItemName" placeholder="New Item (e.g., Milk)" class="p-2 border rounded-md w-full mb-2" required>
+                                <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Item</button>
+                            </form>
+                            <ul id="groceryItemList" class="mt-4 max-h-48 overflow-y-auto"></ul>
                         </div>
                         <!-- Data Management -->
                         <div class="bg-white p-6 rounded-lg shadow-md">
@@ -371,7 +406,8 @@
             </div>
             <form id="itemizationForm" class="flex gap-2 mb-4">
                 <input type="hidden" id="itemizationExpenseId">
-                <input type="text" id="itemName" placeholder="Item Name" class="flex-grow p-2 border rounded-md" required>
+                <input type="text" id="itemName" placeholder="Item Name" class="flex-grow p-2 border rounded-md" required list="groceryDataList">
+                <datalist id="groceryDataList"></datalist>
                 <input type="number" step="0.01" id="itemAmount" placeholder="Amount" class="w-32 p-2 border rounded-md" required>
                 <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Add</button>
             </form>
@@ -426,6 +462,9 @@
                     }
                      if (!db.objectStoreNames.contains('people')) {
                         db.createObjectStore('people', { keyPath: 'id', autoIncrement: true });
+                    }
+                     if (!db.objectStoreNames.contains('groceryItems')) {
+                        db.createObjectStore('groceryItems', { keyPath: 'id', autoIncrement: true });
                     }
                 };
 
@@ -530,7 +569,12 @@
                 const year = today.getFullYear();
                 const month = (today.getMonth() + 1).toString().padStart(2, '0');
                 document.getElementById('reportMonth').value = `${year}-${month}`;
+                document.getElementById('reportYear').value = year;
                 generateReports();
+                generateYearlyReports();
+
+                document.getElementById('reportYear').addEventListener('change', generateYearlyReports);
+                document.getElementById('groceryItemSelect').addEventListener('change', generateYearlyReports);
 
                 // Setup Data Management buttons
                 document.getElementById('exportButton').addEventListener('click', exportData);
@@ -560,8 +604,10 @@
             await loadPaymentMethods();
             await loadCategories();
             await loadPeople();
+            await loadGroceryItems();
             await updateDashboard();
             await generateReports();
+            await generateYearlyReports();
             await renderExpenseCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
             await updateBudgetSummary();
         }
@@ -718,6 +764,15 @@
                 document.getElementById('personId').value = '';
                 loadPeople();
                 updateDashboard();
+            });
+
+            // Grocery Item Form
+            document.getElementById('groceryItemForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const itemName = document.getElementById('newGroceryItemName').value;
+                await addObject('groceryItems', { name: itemName });
+                e.target.reset();
+                loadGroceryItems();
             });
         }
         
@@ -1611,7 +1666,7 @@
         // --- DATA MANAGEMENT ---
         async function exportData() {
             try {
-                const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people'];
+                const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people', 'groceryItems'];
                 const exportObject = {};
 
                 for (const storeName of stores) {
@@ -1646,7 +1701,7 @@
                 reader.onload = async (e) => {
                     try {
                         const data = JSON.parse(e.target.result);
-                        const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people'];
+                        const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people', 'groceryItems'];
 
                         for (const storeName of stores) {
                             if (!data.hasOwnProperty(storeName) || !Array.isArray(data[storeName])) {
@@ -1689,6 +1744,142 @@
             
             showConfirmation('Import Data', 'This will overwrite all current data. Are you sure?', onConfirmImport);
             event.target.value = null;
+        }
+
+        // --- GROCERY ITEMS LOGIC ---
+        async function loadGroceryItems() {
+            const items = await getAllObjects('groceryItems');
+            const listEl = document.getElementById('groceryItemList');
+            const dataListEl = document.getElementById('groceryDataList');
+            const selectEl = document.getElementById('groceryItemSelect');
+
+            listEl.innerHTML = '';
+            dataListEl.innerHTML = '';
+            selectEl.innerHTML = '<option value="">Select an item</option>';
+
+            items.sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
+                // Populate settings list
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-2 border-b';
+                li.innerHTML = `
+                    <span>${item.name}</span>
+                    <button onclick="deleteGroceryItem(${item.id})" class="text-red-500 hover:underline">Delete</button>
+                `;
+                listEl.appendChild(li);
+
+                // Populate datalist for autocomplete
+                const option = document.createElement('option');
+                option.value = item.name;
+                dataListEl.appendChild(option);
+
+                // Populate report dropdown
+                const selectOption = document.createElement('option');
+                selectOption.value = item.name;
+                selectOption.textContent = item.name;
+                selectEl.appendChild(selectOption);
+            });
+        }
+
+        async function deleteGroceryItem(id) {
+            showConfirmation('Delete Grocery Item', 'Are you sure?', async () => {
+                await deleteObject('groceryItems', id);
+                loadGroceryItems();
+                showNotification('Grocery item deleted.');
+            });
+        }
+
+        async function generateYearlyReports() {
+            const year = document.getElementById('reportYear').value;
+            if (!year) return;
+
+            const allExpenses = await getAllObjects('expenses');
+            const yearlyExpenses = allExpenses.filter(e => e.date.startsWith(year));
+
+            // --- Yearly Spend by Category ---
+            const categorySpend = yearlyExpenses.reduce((acc, expense) => {
+                acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+                return acc;
+            }, {});
+            const categoryEl = document.getElementById('yearlyCategorySpendReport');
+            categoryEl.innerHTML = '';
+            if (Object.keys(categorySpend).length > 0) {
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc list-inside';
+                for (const category in categorySpend) {
+                    const li = document.createElement('li');
+                    li.textContent = `${category}: $${categorySpend[category].toFixed(2)}`;
+                    ul.appendChild(li);
+                }
+                categoryEl.appendChild(ul);
+            } else {
+                categoryEl.innerHTML = '<p>No expenses recorded for this year.</p>';
+            }
+
+            // --- Yearly Spend by Subcategory ---
+            const subcategorySpend = yearlyExpenses.reduce((acc, expense) => {
+                const key = `${expense.category} / ${expense.subcategory}`;
+                acc[key] = (acc[key] || 0) + expense.amount;
+                return acc;
+            }, {});
+            const subcategoryEl = document.getElementById('yearlySubcategorySpendReport');
+            subcategoryEl.innerHTML = '';
+            if (Object.keys(subcategorySpend).length > 0) {
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc list-inside';
+                for (const sub in subcategorySpend) {
+                    const li = document.createElement('li');
+                    li.textContent = `${sub}: $${subcategorySpend[sub].toFixed(2)}`;
+                    ul.appendChild(li);
+                }
+                subcategoryEl.appendChild(ul);
+            } else {
+                subcategoryEl.innerHTML = '<p>No expenses recorded for this year.</p>';
+            }
+
+            // --- Grocery Price Tracker ---
+            const selectedItem = document.getElementById('groceryItemSelect').value;
+            const priceTrackerEl = document.getElementById('groceryPriceTrackerReport');
+            priceTrackerEl.innerHTML = '';
+            if (selectedItem) {
+                const priceHistory = [];
+                yearlyExpenses.forEach(expense => {
+                    if (expense.items && expense.items.length > 0) {
+                        expense.items.forEach(item => {
+                            if (item.name === selectedItem) {
+                                priceHistory.push({ date: expense.date, amount: item.amount, payee: expense.payee });
+                            }
+                        });
+                    }
+                });
+
+                if (priceHistory.length > 0) {
+                    const table = document.createElement('table');
+                    table.className = 'min-w-full bg-white';
+                    table.innerHTML = `
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th class="py-2 px-4 text-left">Date</th>
+                                <th class="py-2 px-4 text-left">Store</th>
+                                <th class="py-2 px-4 text-right">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${priceHistory.sort((a,b) => new Date(a.date) - new Date(b.date)).map(item => `
+                                <tr>
+                                    <td class="border px-4 py-2">${item.date}</td>
+                                    <td class="border px-4 py-2">${item.payee}</td>
+                                    <td class="border px-4 py-2 text-right">$${item.amount.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    `;
+                    priceTrackerEl.appendChild(table);
+                } else {
+                    priceTrackerEl.innerHTML = '<p>No purchases of this item found for the selected year.</p>';
+                }
+            } else {
+                priceTrackerEl.innerHTML = '<p>Select an item to see its price history.</p>';
+            }
         }
 
     </script>
