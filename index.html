@@ -33,6 +33,9 @@
         #sidebar.translate-x-0 {
             transform: translateX(0);
         }
+        .active-nav {
+            background-color: #4A5568; /* A darker gray for active state */
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -40,7 +43,7 @@
     <div class="flex h-screen bg-gray-100">
         <!-- Sidebar -->
         <aside id="sidebar" class="w-64 bg-gray-800 text-white p-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30">
-            <h2 class="text-2xl font-bold mb-6">Home Budget</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center">Fast Budget</h2>
             <nav id="mainNav">
                 <a href="#" onclick="showView('dashboardView', this)" class="nav-link active-nav flex items-center px-4 py-2 rounded-md hover:bg-gray-700">Dashboard</a>
                 <a href="#" onclick="showView('incomeView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Income</a>
@@ -64,16 +67,56 @@
             <main id="app" class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 sm:p-6 lg:p-8">
                 <!-- Dashboard View -->
                 <div id="dashboardView" class="view">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow-md">
+                    <!-- Desktop View -->
+                    <div class="hidden md:grid md:grid-cols-3 md:gap-6">
+                        <div class="col-span-2">
+                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div class="bg-white p-4 rounded-lg shadow">
+                                    <h4 class="text-gray-500">Balance</h4>
+                                    <p id="desktopBalance" class="text-2xl font-bold">$0.00</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow">
+                                    <h4 class="text-gray-500">This Month</h4>
+                                    <p id="desktopThisMonth" class="text-2xl font-bold text-green-600">$0.00</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow">
+                                    <h4 class="text-gray-500">Last Month</h4>
+                                    <p id="desktopLastMonth" class="text-2xl font-bold text-red-600">$0.00</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                                <h3 class="text-xl font-semibold mb-4">Balance Overview</h3>
+                                <div class="h-64 bg-gray-200 rounded-md flex items-center justify-center">
+                                    <p class="text-gray-500">Chart Placeholder</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <h3 class="text-xl font-semibold mb-4">Recent Transactions</h3>
+                                <div id="desktopRecentTransactions"></div>
+                            </div>
+                        </div>
+                        <div class="col-span-1">
+                            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                                <h3 class="text-xl font-semibold mb-4">Budgets</h3>
+                                <div id="desktopBudgets" class="space-y-4"></div>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow">
+                                <h3 class="text-xl font-semibold mb-4">Upcoming Birthdays</h3>
+                                <ul id="upcomingBirthdays" class="list-disc list-inside space-y-2"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mobile View -->
+                    <div class="md:hidden">
+                         <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                             <h3 class="text-xl font-semibold mb-2">Monthly Summary</h3>
                             <p>Total Income: <span id="summaryIncome" class="font-bold text-green-600">$0.00</span></p>
                             <p>Total Expenses: <span id="summaryExpenses" class="font-bold text-red-600">$0.00</span></p>
                             <p>Net Balance: <span id="summaryBalance" class="font-bold text-blue-600">$0.00</span></p>
                         </div>
                          <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-xl font-semibold mb-2">Upcoming Birthdays</h3>
-                            <ul id="upcomingBirthdays" class="list-disc list-inside"></ul>
+                            <h3 class="text-xl font-semibold mb-2">Upcoming Budgeted Expenses</h3>
+                            <div id="mobileUpcomingExpenses"></div>
                         </div>
                     </div>
                 </div>
@@ -1189,33 +1232,158 @@
             const incomes = await getAllObjects('income');
             const expenses = await getAllObjects('expenses');
             const people = await getAllObjects('people');
+            const budgets = await getAllObjects('budgets');
+            const subscriptions = await getAllObjects('subscriptions');
 
             const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
             const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
             const balance = totalIncome - totalExpenses;
 
-            document.getElementById('summaryIncome').textContent = `$${totalIncome.toFixed(2)}`;
-            document.getElementById('summaryExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
-            document.getElementById('summaryBalance').textContent = `$${balance.toFixed(2)}`;
-            
-            const upcomingBirthdaysList = document.getElementById('upcomingBirthdays');
-            upcomingBirthdaysList.innerHTML = '';
-            const today = new Date();
-            const upcoming = people.filter(p => {
-                const birthday = new Date(p.birthday);
-                birthday.setFullYear(today.getFullYear());
-                const diff = birthday.getTime() - today.getTime();
-                return diff > 0 && diff < (30 * 24 * 60 * 60 * 1000); // within 30 days
-            }).sort((a,b) => new Date(a.birthday) - new Date(b.birthday));
+            // Mobile Summary
+            const summaryIncomeEl = document.getElementById('summaryIncome');
+            if(summaryIncomeEl) summaryIncomeEl.textContent = `$${totalIncome.toFixed(2)}`;
+            const summaryExpensesEl = document.getElementById('summaryExpenses');
+            if(summaryExpensesEl) summaryExpensesEl.textContent = `$${totalExpenses.toFixed(2)}`;
+            const summaryBalanceEl = document.getElementById('summaryBalance');
+            if(summaryBalanceEl) summaryBalanceEl.textContent = `$${balance.toFixed(2)}`;
 
-            if (upcoming.length > 0) {
-                upcoming.forEach(p => {
-                    const li = document.createElement('li');
-                    li.textContent = `${p.name} on ${new Date(p.birthday).toLocaleDateString()}`;
-                    upcomingBirthdaysList.appendChild(li);
+            // Desktop Summary
+            const desktopBalanceEl = document.getElementById('desktopBalance');
+            if(desktopBalanceEl) desktopBalanceEl.textContent = `$${balance.toFixed(2)}`;
+            
+            const today = new Date();
+            const currentMonthStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+            const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            const lastMonthStr = `${lastMonthDate.getFullYear()}-${(lastMonthDate.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            const thisMonthIncome = incomes.filter(i => (i.type === 'recurring') || (i.date && i.date.startsWith(currentMonthStr))).reduce((sum, i) => sum + i.amount, 0);
+            const thisMonthExpenses = expenses.filter(e => e.date.startsWith(currentMonthStr)).reduce((sum, e) => sum + e.amount, 0);
+            const thisMonthNet = thisMonthIncome - thisMonthExpenses;
+            
+            const lastMonthIncome = incomes.filter(i => (i.type === 'recurring') || (i.date && i.date.startsWith(lastMonthStr))).reduce((sum, i) => sum + i.amount, 0);
+            const lastMonthExpenses = expenses.filter(e => e.date.startsWith(lastMonthStr)).reduce((sum, e) => sum + e.amount, 0);
+            const lastMonthNet = lastMonthIncome - lastMonthExpenses;
+
+            const desktopThisMonthEl = document.getElementById('desktopThisMonth');
+            if(desktopThisMonthEl) {
+                desktopThisMonthEl.textContent = `$${thisMonthNet.toFixed(2)}`;
+                desktopThisMonthEl.className = `text-2xl font-bold ${thisMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            }
+            const desktopLastMonthEl = document.getElementById('desktopLastMonth');
+            if(desktopLastMonthEl) {
+                desktopLastMonthEl.textContent = `$${lastMonthNet.toFixed(2)}`;
+                desktopLastMonthEl.className = `text-2xl font-bold ${lastMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            }
+
+            // Desktop Recent Transactions
+            const desktopRecentTransactionsEl = document.getElementById('desktopRecentTransactions');
+            if (desktopRecentTransactionsEl) {
+                desktopRecentTransactionsEl.innerHTML = '';
+                const recentExpenses = expenses.sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+                if (recentExpenses.length > 0) {
+                    const list = document.createElement('ul');
+                    list.className = 'space-y-3';
+                    recentExpenses.forEach(exp => {
+                        const li = document.createElement('li');
+                        li.className = 'flex justify-between items-center';
+                        li.innerHTML = `
+                            <div>
+                                <p class="font-semibold">${exp.payee}</p>
+                                <p class="text-sm text-gray-500">${exp.date}</p>
+                            </div>
+                            <p class="font-bold text-red-600">-$${exp.amount.toFixed(2)}</p>
+                        `;
+                        list.appendChild(li);
+                    });
+                    desktopRecentTransactionsEl.appendChild(list);
+                } else {
+                    desktopRecentTransactionsEl.innerHTML = '<p class="text-gray-500">No recent transactions.</p>';
+                }
+            }
+
+            // Desktop Budgets
+            const desktopBudgetsEl = document.getElementById('desktopBudgets');
+            if (desktopBudgetsEl) {
+                desktopBudgetsEl.innerHTML = '';
+                const monthlyExpenses = expenses.filter(e => e.date.startsWith(currentMonthStr));
+                const allActiveSubs = subscriptions.filter(s => s.status === 'active');
+                
+                budgets.forEach(budget => {
+                    const actualSpend = monthlyExpenses.filter(e => e.category === budget.category && e.subcategory === budget.subcategory).reduce((sum, e) => sum + e.amount, 0);
+                    const percentage = budget.amount > 0 ? (actualSpend / budget.amount) * 100 : 0;
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div class="flex justify-between mb-1">
+                            <span class="font-semibold">${budget.category} / ${budget.subcategory}</span>
+                            <span>$${actualSpend.toFixed(2)} / $${budget.amount.toFixed(2)}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-green-600 h-2.5 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                    `;
+                    desktopBudgetsEl.appendChild(div);
                 });
-            } else {
-                upcomingBirthdaysList.innerHTML = '<li>No upcoming birthdays in the next 30 days.</li>';
+
+                const subCost = allActiveSubs.reduce((sum, s) => sum + s.amount, 0);
+                 if (subCost > 0) {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div class="flex justify-between mb-1">
+                            <span class="font-semibold">Subscriptions</span>
+                            <span>$${subCost.toFixed(2)}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 100%"></div>
+                        </div>
+                    `;
+                    desktopBudgetsEl.appendChild(div);
+                }
+            }
+            
+            // Mobile Upcoming Expenses
+            const mobileUpcomingExpensesEl = document.getElementById('mobileUpcomingExpenses');
+            if (mobileUpcomingExpensesEl) {
+                 mobileUpcomingExpensesEl.innerHTML = '';
+                 const allActiveSubs = subscriptions.filter(s => s.status === 'active');
+                 const upcoming = [...budgets, ...allActiveSubs];
+                 if(upcoming.length > 0) {
+                    const list = document.createElement('ul');
+                    list.className = 'space-y-3';
+                    upcoming.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'flex justify-between items-center';
+                        li.innerHTML = `
+                            <p class="font-semibold">${item.name || `${item.category} / ${item.subcategory}`}</p>
+                            <p class="font-bold">$${item.amount.toFixed(2)}</p>
+                        `;
+                        list.appendChild(li);
+                    });
+                    mobileUpcomingExpensesEl.appendChild(list);
+                 } else {
+                    mobileUpcomingExpensesEl.innerHTML = '<p class="text-gray-500">No upcoming expenses.</p>';
+                 }
+            }
+
+            // Upcoming Birthdays
+            const upcomingBirthdaysList = document.getElementById('upcomingBirthdays');
+            if (upcomingBirthdaysList) {
+                upcomingBirthdaysList.innerHTML = '';
+                const upcoming = people.filter(p => {
+                    const birthday = new Date(p.birthday);
+                    birthday.setFullYear(today.getFullYear());
+                    const diff = birthday.getTime() - today.getTime();
+                    return diff > 0 && diff < (30 * 24 * 60 * 60 * 1000); // within 30 days
+                }).sort((a,b) => new Date(a.birthday) - new Date(b.birthday));
+
+                if (upcoming.length > 0) {
+                    upcoming.forEach(p => {
+                        const li = document.createElement('li');
+                        li.textContent = `${p.name} on ${new Date(p.birthday).toLocaleDateString()}`;
+                        upcomingBirthdaysList.appendChild(li);
+                    });
+                } else {
+                    upcomingBirthdaysList.innerHTML = '<li>No upcoming birthdays in the next 30 days.</li>';
+                }
             }
         }
 
