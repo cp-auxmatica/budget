@@ -37,6 +37,9 @@
         .active-nav {
             background-color: #4A5568; /* A darker gray for active state */
         }
+        th[data-sort] {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -92,15 +95,9 @@
                                     <p id="desktopLastMonth" class="text-2xl font-bold text-red-600">$0</p>
                                 </div>
                             </div>
-                            <div class="bg-white p-6 rounded-lg shadow mb-6">
-                                <h3 class="text-xl font-semibold mb-4">Balance Overview</h3>
-                                <div class="h-64 bg-gray-200 rounded-md flex items-center justify-center">
-                                    <p class="text-gray-500">Chart Placeholder</p>
-                                </div>
-                            </div>
                             <div class="bg-white p-6 rounded-lg shadow">
-                                <h3 class="text-xl font-semibold mb-4">Recent Transactions</h3>
-                                <div id="desktopRecentTransactions"></div>
+                                <h3 class="text-xl font-semibold mb-4">Upcoming & Recent Transactions</h3>
+                                <div id="desktopTransactionsList"></div>
                             </div>
                         </div>
                         <div class="col-span-1">
@@ -173,11 +170,11 @@
                                 <table class="min-w-full bg-white">
                                     <thead class="bg-gray-200">
                                         <tr>
-                                            <th class="py-2 px-4 text-left">Name</th>
-                                            <th class="py-2 px-4 text-left">Source</th>
-                                            <th class="py-2 px-4 text-left">Type</th>
-                                            <th class="py-2 px-4 text-right">Amount</th>
-                                            <th class="py-2 px-4 text-left">Date</th>
+                                            <th class="py-2 px-4 text-left" data-sort="name">Name</th>
+                                            <th class="py-2 px-4 text-left" data-sort="source">Source</th>
+                                            <th class="py-2 px-4 text-left" data-sort="type">Type</th>
+                                            <th class="py-2 px-4 text-right" data-sort="amount">Amount</th>
+                                            <th class="py-2 px-4 text-left" data-sort="date">Date</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
@@ -209,11 +206,11 @@
                                 <table class="min-w-full bg-white">
                                     <thead class="bg-gray-200">
                                         <tr>
-                                            <th class="py-2 px-4 text-left">Payee</th>
-                                            <th class="py-2 px-4 text-left">Category</th>
-                                            <th class="py-2 px-4 text-left">Payment Type</th>
-                                            <th class="py-2 px-4 text-right">Amount</th>
-                                            <th class="py-2 px-4 text-left">Date</th>
+                                            <th class="py-2 px-4 text-left" data-sort="payee">Payee</th>
+                                            <th class="py-2 px-4 text-left" data-sort="category">Category</th>
+                                            <th class="py-2 px-4 text-left" data-sort="paymentType">Payment Type</th>
+                                            <th class="py-2 px-4 text-right" data-sort="amount">Amount</th>
+                                            <th class="py-2 px-4 text-left" data-sort="date">Date</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
@@ -262,11 +259,11 @@
                                <table class="min-w-full bg-white">
                                     <thead class="bg-gray-200">
                                         <tr>
-                                            <th class="py-2 px-4 text-left">Name</th>
-                                            <th class="py-2 px-4 text-right">Amount</th>
-                                            <th class="py-2 px-4 text-left">Start Date</th>
-                                            <th class="py-2 px-4 text-left">Payment Method</th>
-                                            <th class="py-2 px-4 text-left">Status</th>
+                                            <th class="py-2 px-4 text-left" data-sort="name">Name</th>
+                                            <th class="py-2 px-4 text-right" data-sort="amount">Amount</th>
+                                            <th class="py-2 px-4 text-left" data-sort="startDate">Start Date</th>
+                                            <th class="py-2 px-4 text-left" data-sort="paymentMethod">Payment Method</th>
+                                            <th class="py-2 px-4 text-left" data-sort="status">Status</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
@@ -309,6 +306,7 @@
                                 <option value="Manual">Manual Pay</option>
                                 <option value="Auto">Auto Pay</option>
                             </select>
+                            <input type="number" id="budgetDueDay" placeholder="Due Day of Month" min="1" max="31" class="p-2 border rounded-md">
                             <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Set/Update Budget</button>
                         </form>
                         <div class="mt-6">
@@ -317,11 +315,11 @@
                                 <table class="min-w-full bg-white">
                                     <thead class="bg-gray-200">
                                         <tr>
-                                            <th class="py-2 px-4 text-left">Category</th>
-                                            <th class="py-2 px-4 text-left">Subcategory</th>
-                                            <th class="py-2 px-4 text-left">Payment Method</th>
-                                            <th class="py-2 px-4 text-left">Pay Type</th>
-                                            <th class="py-2 px-4 text-right">Amount</th>
+                                            <th class="py-2 px-4 text-left" data-sort="category">Category</th>
+                                            <th class="py-2 px-4 text-left" data-sort="subcategory">Subcategory</th>
+                                            <th class="py-2 px-4 text-left" data-sort="paymentMethod">Payment Method</th>
+                                            <th class="py-2 px-4 text-left" data-sort="payType">Pay Type</th>
+                                            <th class="py-2 px-4 text-right" data-sort="amount">Amount</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
@@ -350,10 +348,10 @@
                                 <table class="min-w-full bg-white">
                                     <thead class="bg-gray-200">
                                         <tr>
-                                            <th class="py-2 px-4 text-left">Category</th>
-                                            <th class="py-2 px-4 text-left">Subcategory</th>
-                                            <th class="py-2 px-4 text-left">Card</th>
-                                            <th class="py-2 px-4 text-right">Multiplier</th>
+                                            <th class="py-2 px-4 text-left" data-sort="category">Category</th>
+                                            <th class="py-2 px-4 text-left" data-sort="subcategory">Subcategory</th>
+                                            <th class="py-2 px-4 text-left" data-sort="card">Card</th>
+                                            <th class="py-2 px-4 text-right" data-sort="multiplier">Multiplier</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
@@ -539,6 +537,7 @@
             </div>
         </div>
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script>
@@ -840,7 +839,8 @@
                     subcategory: document.getElementById('budgetSubcategory').value,
                     amount: parseFloat(document.getElementById('budgetAmount').value),
                     paymentMethod: document.getElementById('budgetPaymentMethod').value,
-                    payType: document.getElementById('budgetPayType').value
+                    payType: document.getElementById('budgetPayType').value,
+                    dueDay: parseInt(document.getElementById('budgetDueDay').value)
                 };
                 const id = document.getElementById('budgetId').value;
                 if(id){
@@ -1172,6 +1172,7 @@
                 document.getElementById('budgetAmount').value = budget.amount;
                 document.getElementById('budgetPaymentMethod').value = budget.paymentMethod;
                 document.getElementById('budgetPayType').value = budget.payType;
+                document.getElementById('budgetDueDay').value = budget.dueDay;
             };
         }
 
