@@ -50,6 +50,7 @@
                 <a href="#" onclick="showView('expensesView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Expenses</a>
                 <a href="#" onclick="showView('subscriptionsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Subscriptions</a>
                 <a href="#" onclick="showView('budgetsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Budgets</a>
+                <a href="#" onclick="showView('pointsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Points</a>
                 <a href="#" onclick="showView('reportsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Reports</a>
                 <a href="#" onclick="showView('settingsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Settings</a>
             </nav>
@@ -110,7 +111,7 @@
                     <div class="md:hidden">
                          <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                             <h3 class="text-xl font-semibold mb-2">Monthly Summary</h3>
-                            <div id="mobileSummary" class="grid grid-cols-3 gap-4 text-center">
+                            <div id="mobileSummary" class="grid grid-cols-3 gap-4 text-center mb-4">
                                 <div class="p-2 bg-green-100 rounded-lg">
                                     <p class="text-sm text-green-800">Income</p>
                                     <p id="summaryIncome" class="text-lg font-bold text-green-600">$0</p>
@@ -123,6 +124,11 @@
                                     <p class="text-sm text-blue-800">Net</p>
                                     <p id="summaryBalance" class="text-lg font-bold text-blue-600">$0</p>
                                 </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="showView('expensesView', document.querySelector('[onclick*=\'expensesView\']'))" class="flex-1 text-center py-2 bg-blue-600 text-white rounded-md">Add Expense</button>
+                                <a href="https://chase.com" target="_blank" class="flex-1 text-center py-2 bg-gray-200 rounded-md">Chase</a>
+                                <button onclick="showView('pointsView', document.querySelector('[onclick*=\'pointsView\']'))" class="flex-1 text-center py-2 bg-gray-200 rounded-md">Points</button>
                             </div>
                         </div>
                          <div class="bg-white p-6 rounded-lg shadow-md">
@@ -187,6 +193,7 @@
                             <select id="expensePaymentType" class="p-2 border rounded-md"></select>
                             <input type="number" step="0.01" id="expenseAmount" placeholder="Amount" class="p-2 border rounded-md" required>
                             <input type="date" id="expenseDate" class="p-2 border rounded-md" required>
+                            <textarea id="expenseNotes" placeholder="Notes (optional)" class="p-2 border rounded-md md:col-span-2"></textarea>
                             <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add/Update Expense</button>
                         </form>
                         <div class="mt-6">
@@ -318,6 +325,38 @@
                     </div>
                 </div>
 
+                 <!-- Points View -->
+                <div id="pointsView" class="view hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-bold mb-4">Credit Card Points</h2>
+                        <form id="pointsForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="hidden" id="pointsId">
+                            <select id="pointsCategory" class="p-2 border rounded-md"></select>
+                            <select id="pointsSubcategory" class="p-2 border rounded-md"></select>
+                            <select id="pointsCard" class="p-2 border rounded-md"></select>
+                            <input type="number" id="pointsMultiplier" placeholder="Points (e.g., 3 for 3x)" class="p-2 border rounded-md" required>
+                            <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Set/Update Rule</button>
+                        </form>
+                        <div class="mt-6">
+                            <h3 class="text-xl font-semibold mb-2">Points Rules</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white">
+                                    <thead class="bg-gray-200">
+                                        <tr>
+                                            <th class="py-2 px-4 text-left">Category</th>
+                                            <th class="py-2 px-4 text-left">Subcategory</th>
+                                            <th class="py-2 px-4 text-left">Card</th>
+                                            <th class="py-2 px-4 text-right">Multiplier</th>
+                                            <th class="py-2 px-4 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pointsList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Reports View -->
                 <div id="reportsView" class="view hidden">
                     <div class="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -330,6 +369,10 @@
                             <div>
                                 <h3 class="text-xl font-semibold mb-2 border-b pb-2">Monthly Overview</h3>
                                 <div id="incomeExpenseReport"></div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 border-b pb-2">Points Summary</h3>
+                                <div id="pointsReport"></div>
                             </div>
                             <div>
                                 <h3 class="text-xl font-semibold mb-2 border-b pb-2">Budget vs. Actual</h3>
@@ -425,8 +468,12 @@
                             <div class="flex flex-col sm:flex-row gap-4">
                                 <button id="exportButton" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Export Data</button>
                                 <label class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300 cursor-pointer text-center">
-                                    Import Data
+                                    Import JSON
                                     <input type="file" id="importFile" class="hidden" accept=".json">
+                                </label>
+                                <label class="flex-1 px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition duration-300 cursor-pointer text-center">
+                                    Import CSV
+                                    <input type="file" id="importCsvFile" class="hidden" accept=".csv">
                                 </label>
                             </div>
                             <p class="text-sm text-gray-600 mt-2">Note: Importing data will overwrite all existing data in the application.</p>
@@ -490,7 +537,7 @@
     <script>
         // --- DATABASE SETUP ---
         const DB_NAME = 'HomeBudgetDB';
-        const DB_VERSION = 3; // Incremented version
+        const DB_VERSION = 4; // Incremented version
         let db;
         let calendarDate = new Date();
 
@@ -529,6 +576,9 @@
                     }
                      if (!db.objectStoreNames.contains('groceryItems')) {
                         db.createObjectStore('groceryItems', { keyPath: 'id', autoIncrement: true });
+                    }
+                     if (!db.objectStoreNames.contains('creditCardPoints')) {
+                        db.createObjectStore('creditCardPoints', { keyPath: 'id', autoIncrement: true });
                     }
                 };
 
@@ -643,6 +693,7 @@
                 // Setup Data Management buttons
                 document.getElementById('exportButton').addEventListener('click', exportData);
                 document.getElementById('importFile').addEventListener('change', importData);
+                document.getElementById('importCsvFile').addEventListener('change', importCsvData);
                 
                 // Setup Calendar
                 setupCalendarNav();
@@ -677,6 +728,7 @@
             await loadCategories();
             await loadPeople();
             await loadGroceryItems();
+            await loadPoints();
             await updateDashboard();
             await generateReports();
             await generateYearlyReports();
@@ -729,6 +781,7 @@
                     paymentType: document.getElementById('expensePaymentType').value,
                     amount: parseFloat(document.getElementById('expenseAmount').value),
                     date: document.getElementById('expenseDate').value,
+                    notes: document.getElementById('expenseNotes').value,
                     items: [] 
                 };
                  const id = document.getElementById('expenseId').value;
@@ -846,6 +899,27 @@
                 e.target.reset();
                 loadGroceryItems();
             });
+
+            // Points Form
+            document.getElementById('pointsForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const pointsData = {
+                    category: document.getElementById('pointsCategory').value,
+                    subcategory: document.getElementById('pointsSubcategory').value,
+                    card: document.getElementById('pointsCard').value,
+                    multiplier: parseFloat(document.getElementById('pointsMultiplier').value)
+                };
+                const id = document.getElementById('pointsId').value;
+                if (id) {
+                    pointsData.id = parseInt(id);
+                    await updateObject('creditCardPoints', pointsData);
+                } else {
+                    await addObject('creditCardPoints', pointsData);
+                }
+                e.target.reset();
+                document.getElementById('pointsId').value = '';
+                loadPoints();
+            });
         }
         
         async function loadIncome() {
@@ -957,6 +1031,7 @@
                 document.getElementById('expensePaymentType').value = expense.paymentType;
                 document.getElementById('expenseAmount').value = expense.amount;
                 document.getElementById('expenseDate').value = expense.date;
+                document.getElementById('expenseNotes').value = expense.notes || '';
             };
         }
 
@@ -1103,7 +1178,8 @@
             const selects = [
                 document.getElementById('expensePaymentType'),
                 document.getElementById('budgetPaymentMethod'),
-                document.getElementById('subscriptionPaymentMethod')
+                document.getElementById('subscriptionPaymentMethod'),
+                document.getElementById('pointsCard')
             ];
             list.innerHTML = '';
             
@@ -1126,7 +1202,10 @@
                 const option = document.createElement('option');
                 option.value = method.name;
                 option.textContent = method.name;
-                selects.forEach(select => select.appendChild(option.cloneNode(true)));
+                selects.forEach(select => {
+                    if (select.id === 'pointsCard' && method.type !== 'Credit Card') return;
+                    select.appendChild(option.cloneNode(true))
+                });
             });
         }
 
@@ -1153,12 +1232,16 @@
         async function loadCategories() {
             const categories = await getAllObjects('categories');
             const list = document.getElementById('categoryList');
-            const expenseCategorySelect = document.getElementById('expenseCategory');
-            const budgetCategorySelect = document.getElementById('budgetCategory');
+            const selects = [
+                document.getElementById('expenseCategory'),
+                document.getElementById('budgetCategory'),
+                document.getElementById('pointsCategory')
+            ];
             
             list.innerHTML = '';
-            expenseCategorySelect.innerHTML = '<option value="">Select Category</option>';
-            budgetCategorySelect.innerHTML = '<option value="">Select Category</option>';
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Select Category</option>';
+            });
 
             categories.forEach(cat => {
                 const div = document.createElement('div');
@@ -1181,8 +1264,7 @@
                 const option = document.createElement('option');
                 option.value = cat.name;
                 option.textContent = cat.name;
-                expenseCategorySelect.appendChild(option.cloneNode(true));
-                budgetCategorySelect.appendChild(option.cloneNode(true));
+                selects.forEach(select => select.appendChild(option.cloneNode(true)));
             });
 
             document.querySelectorAll('.subcategoryForm').forEach(form => {
@@ -1503,12 +1585,14 @@
             const budgetActualReportEl = document.getElementById('budgetActualReport');
             const categorySpendReportEl = document.getElementById('categorySpendReport');
             const paymentTypeSpendReportEl = document.getElementById('paymentTypeSpendReport');
+            const pointsReportEl = document.getElementById('pointsReport');
 
             if (!reportMonthValue) {
                 incomeExpenseReportEl.innerHTML = '<p>Select a month to view reports.</p>';
                 budgetActualReportEl.innerHTML = '';
                 categorySpendReportEl.innerHTML = '';
                 paymentTypeSpendReportEl.innerHTML = '';
+                pointsReportEl.innerHTML = '';
                 return;
             }
 
@@ -1516,6 +1600,7 @@
             const allBudgets = await getAllObjects('budgets');
             const allSubscriptions = await getAllObjects('subscriptions');
             const allIncome = await getAllObjects('income');
+            const allPointsRules = await getAllObjects('creditCardPoints');
 
             // --- Calculations ---
             const monthlyExpenses = allExpenses.filter(expense => expense.date.startsWith(reportMonthValue));
@@ -1652,11 +1737,35 @@
             } else {
                 paymentTypeSpendReportEl.innerHTML = '<p>No expenses recorded for this month.</p>';
             }
+            
+            // --- 5. Points Report ---
+            const pointsByCard = {};
+            monthlyExpenses.forEach(expense => {
+                const rule = allPointsRules.find(r => r.category === expense.category && r.subcategory === expense.subcategory && r.card === expense.paymentType);
+                if (rule) {
+                    const points = Math.floor(expense.amount * rule.multiplier);
+                    pointsByCard[rule.card] = (pointsByCard[rule.card] || 0) + points;
+                }
+            });
+             pointsReportEl.innerHTML = '';
+             if (Object.keys(pointsByCard).length > 0) {
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc list-inside';
+                for (const card in pointsByCard) {
+                    const li = document.createElement('li');
+                    li.textContent = `${card}: ${pointsByCard[card].toLocaleString()} points`;
+                    ul.appendChild(li);
+                }
+                pointsReportEl.appendChild(ul);
+            } else {
+                pointsReportEl.innerHTML = '<p>No points earned this month.</p>';
+            }
         }
         
         // --- EVENT LISTENERS for Category/Subcategory dropdowns ---
         document.getElementById('expenseCategory').addEventListener('change', (e) => handleCategoryChange(e.target.value, 'expenseSubcategory'));
         document.getElementById('budgetCategory').addEventListener('change', (e) => handleCategoryChange(e.target.value, 'budgetSubcategory'));
+        document.getElementById('pointsCategory').addEventListener('change', (e) => handleCategoryChange(e.target.value, 'pointsSubcategory'));
 
         async function handleCategoryChange(categoryName, subcategorySelectId) {
             const categories = await getAllObjects('categories');
@@ -1881,7 +1990,7 @@
         // --- DATA MANAGEMENT ---
         async function exportData() {
             try {
-                const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people', 'groceryItems'];
+                const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people', 'groceryItems', 'creditCardPoints'];
                 const exportObject = {};
 
                 for (const storeName of stores) {
@@ -1916,29 +2025,33 @@
                 reader.onload = async (e) => {
                     try {
                         const data = JSON.parse(e.target.result);
-                        const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people', 'groceryItems'];
+                        const stores = ['income', 'expenses', 'subscriptions', 'budgets', 'paymentMethods', 'categories', 'people', 'groceryItems', 'creditCardPoints'];
 
                         for (const storeName of stores) {
-                            if (!data.hasOwnProperty(storeName) || !Array.isArray(data[storeName])) {
+                            if (data.hasOwnProperty(storeName) && !Array.isArray(data[storeName])) {
                                 throw new Error(`Invalid or missing data for: ${storeName}`);
                             }
                         }
 
                         const transaction = db.transaction(stores, 'readwrite');
                         for (const storeName of stores) {
-                            await new Promise((resolve, reject) => {
-                                const request = transaction.objectStore(storeName).clear();
-                                request.onsuccess = resolve;
-                                request.onerror = reject;
-                            });
+                            if(data.hasOwnProperty(storeName)) {
+                                await new Promise((resolve, reject) => {
+                                    const request = transaction.objectStore(storeName).clear();
+                                    request.onsuccess = resolve;
+                                    request.onerror = reject;
+                                });
+                            }
                         }
                         
                         const importTransaction = db.transaction(stores, 'readwrite');
                         for (const storeName of stores) {
-                            const store = importTransaction.objectStore(storeName);
-                            for (const item of data[storeName]) {
-                                if (item.hasOwnProperty('id')) delete item.id;
-                                store.add(item);
+                             if(data.hasOwnProperty(storeName)) {
+                                const store = importTransaction.objectStore(storeName);
+                                for (const item of data[storeName]) {
+                                    if (item.hasOwnProperty('id')) delete item.id;
+                                    store.add(item);
+                                }
                             }
                         }
 
@@ -1957,7 +2070,46 @@
                 reader.readAsText(file);
             };
             
-            showConfirmation('Import Data', 'This will overwrite all current data. Are you sure?', onConfirmImport);
+            showConfirmation('Import JSON Data', 'This will overwrite all current data. Are you sure?', onConfirmImport);
+            event.target.value = null;
+        }
+
+        function importCsvData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const onConfirmImport = () => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const csv = e.target.result;
+                        const lines = csv.split('\n').slice(1); // Skip header
+                        for(const line of lines) {
+                            if (line.trim() === '') continue;
+                            const [date, payee, category, subcategory, paymentType, amount, notes] = line.split(',');
+                            const expenseData = {
+                                date: date.trim(),
+                                payee: payee.trim(),
+                                category: category.trim(),
+                                subcategory: subcategory.trim(),
+                                paymentType: paymentType.trim(),
+                                amount: parseFloat(amount.trim()),
+                                notes: notes ? notes.trim() : '',
+                                items: []
+                            };
+                            await addObject('expenses', expenseData);
+                        }
+                        await reloadAllData();
+                        showNotification('CSV data imported successfully!');
+                    } catch (error) {
+                         console.error('Error importing CSV:', error);
+                        showNotification(`CSV Import failed: ${error.message}`, true);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            showConfirmation('Import CSV Expenses', 'This will add new expenses from the CSV. Required format: Date,Payee,Category,Subcategory,Payment Type,Amount,Notes', onConfirmImport);
             event.target.value = null;
         }
 
@@ -2095,6 +2247,43 @@
             } else {
                 priceTrackerEl.innerHTML = '<p>Select an item to see its price history.</p>';
             }
+        }
+        
+        // --- POINTS LOGIC ---
+        async function loadPoints() {
+            const points = await getAllObjects('creditCardPoints');
+            const list = document.getElementById('pointsList');
+            list.innerHTML = '';
+            points.forEach(point => {
+                const row = list.insertRow();
+                row.innerHTML = `
+                    <td class="border px-4 py-2">${point.category}</td>
+                    <td class="border px-4 py-2">${point.subcategory}</td>
+                    <td class="border px-4 py-2">${point.card}</td>
+                    <td class="border px-4 py-2 text-right">${point.multiplier}x</td>
+                    <td class="border px-4 py-2 text-center">
+                        <button onclick="editPoint(${point.id})" class="text-blue-500 hover:underline">Edit</button>
+                        <button onclick="deletePoint(${point.id})" class="text-red-500 hover:underline ml-2">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        async function editPoint(id) {
+            const point = await getObject('creditCardPoints', id);
+            document.getElementById('pointsId').value = point.id;
+            document.getElementById('pointsCategory').value = point.category;
+            await handleCategoryChangeForEdit(point.category, point.subcategory, 'pointsSubcategory');
+            document.getElementById('pointsCard').value = point.card;
+            document.getElementById('pointsMultiplier').value = point.multiplier;
+        }
+
+        async function deletePoint(id) {
+            showConfirmation('Delete Point Rule', 'Are you sure?', async () => {
+                await deleteObject('creditCardPoints', id);
+                loadPoints();
+                showNotification('Point rule deleted.');
+            });
         }
 
         function formatCurrency(amount) {
