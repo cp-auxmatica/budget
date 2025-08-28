@@ -73,15 +73,15 @@
                              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div class="bg-white p-4 rounded-lg shadow">
                                     <h4 class="text-gray-500">Balance</h4>
-                                    <p id="desktopBalance" class="text-2xl font-bold">$0.00</p>
+                                    <p id="desktopBalance" class="text-2xl font-bold">$0</p>
                                 </div>
                                 <div class="bg-white p-4 rounded-lg shadow">
                                     <h4 class="text-gray-500">This Month</h4>
-                                    <p id="desktopThisMonth" class="text-2xl font-bold text-green-600">$0.00</p>
+                                    <p id="desktopThisMonth" class="text-2xl font-bold text-green-600">$0</p>
                                 </div>
                                 <div class="bg-white p-4 rounded-lg shadow">
                                     <h4 class="text-gray-500">Last Month</h4>
-                                    <p id="desktopLastMonth" class="text-2xl font-bold text-red-600">$0.00</p>
+                                    <p id="desktopLastMonth" class="text-2xl font-bold text-red-600">$0</p>
                                 </div>
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow mb-6">
@@ -110,9 +110,20 @@
                     <div class="md:hidden">
                          <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                             <h3 class="text-xl font-semibold mb-2">Monthly Summary</h3>
-                            <p>Total Income: <span id="summaryIncome" class="font-bold text-green-600">$0.00</span></p>
-                            <p>Total Expenses: <span id="summaryExpenses" class="font-bold text-red-600">$0.00</span></p>
-                            <p>Net Balance: <span id="summaryBalance" class="font-bold text-blue-600">$0.00</span></p>
+                            <div id="mobileSummary" class="grid grid-cols-3 gap-4 text-center">
+                                <div class="p-2 bg-green-100 rounded-lg">
+                                    <p class="text-sm text-green-800">Income</p>
+                                    <p id="summaryIncome" class="text-lg font-bold text-green-600">$0</p>
+                                </div>
+                                <div class="p-2 bg-red-100 rounded-lg">
+                                    <p class="text-sm text-red-800">Expenses</p>
+                                    <p id="summaryExpenses" class="text-lg font-bold text-red-600">$0</p>
+                                </div>
+                                <div class="p-2 bg-blue-100 rounded-lg">
+                                    <p class="text-sm text-blue-800">Net</p>
+                                    <p id="summaryBalance" class="text-lg font-bold text-blue-600">$0</p>
+                                </div>
+                            </div>
                         </div>
                          <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-2">Upcoming Budgeted Expenses</h3>
@@ -135,7 +146,7 @@
                             </select>
                             <input type="number" step="0.01" id="incomeAmount" placeholder="Amount" class="p-2 border rounded-md" required>
                             <div class="md:col-span-2">
-                                <input type="date" id="incomeDate" class="p-2 border rounded-md w-full hidden">
+                                <input type="date" id="incomeDate" class="p-2 border rounded-md w-full">
                             </div>
                             <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Add/Update Income</button>
                         </form>
@@ -163,21 +174,6 @@
                 <!-- Expenses View -->
                 <div id="expensesView" class="view hidden">
                     <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-                        <h2 class="text-2xl font-bold mb-4">Expense Calendar</h2>
-                        <div class="flex items-center justify-between mb-4">
-                            <button id="prevMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&lt;</button>
-                            <h3 id="calendarHeader" class="text-xl font-semibold"></h3>
-                            <button id="nextMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&gt;</button>
-                        </div>
-                        <div class="grid grid-cols-7 gap-1 text-center font-semibold mb-2">
-                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                        </div>
-                        <div id="calendarGrid" class="grid grid-cols-7 gap-1">
-                            <!-- Calendar days will be generated here -->
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow-md">
                         <h2 class="text-2xl font-bold mb-4">Track Expenses</h2>
                         <form id="expenseForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input type="hidden" id="expenseId">
@@ -208,6 +204,22 @@
                             </div>
                         </div>
                     </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <button id="toggleCalendarBtn" class="w-full text-left font-semibold text-xl mb-4">View Calendar</button>
+                        <div id="calendarContainer" class="hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <button id="prevMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&lt;</button>
+                                <h3 id="calendarHeader" class="text-xl font-semibold"></h3>
+                                <button id="nextMonth" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&gt;</button>
+                            </div>
+                            <div class="grid grid-cols-7 gap-1 text-center font-semibold mb-2">
+                                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                            </div>
+                            <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+                                <!-- Calendar days will be generated here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Subscriptions View -->
@@ -215,7 +227,7 @@
                      <div class="bg-white p-6 rounded-lg shadow-md">
                         <div class="mb-6 bg-blue-50 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold text-blue-800">Total Monthly Subscription Cost</h3>
-                            <p id="totalSubscriptionCost" class="text-3xl font-bold text-blue-600">$0.00</p>
+                            <p id="totalSubscriptionCost" class="text-3xl font-bold text-blue-600">$0</p>
                         </div>
                         <h2 class="text-2xl font-bold mb-4">Manage Subscriptions</h2>
                         <form id="subscriptionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,15 +267,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                             <div class="p-4 bg-green-100 rounded-lg">
                                 <p class="text-sm text-green-800">Recurring Income</p>
-                                <p id="summaryRecurringIncome" class="text-2xl font-bold text-green-600">$0.00</p>
+                                <p id="summaryRecurringIncome" class="text-2xl font-bold text-green-600">$0</p>
                             </div>
                             <div class="p-4 bg-red-100 rounded-lg">
                                 <p class="text-sm text-red-800">Total Budgeted</p>
-                                <p id="summaryTotalBudgeted" class="text-2xl font-bold text-red-600">$0.00</p>
+                                <p id="summaryTotalBudgeted" class="text-2xl font-bold text-red-600">$0</p>
                             </div>
                             <div class="p-4 rounded-lg bg-blue-100">
                                 <p class="text-sm text-blue-800">Remaining</p>
-                                <p id="summaryBudgetRemaining" class="text-2xl font-bold text-blue-600">$0.00</p>
+                                <p id="summaryBudgetRemaining" class="text-2xl font-bold text-blue-600">$0</p>
                             </div>
                         </div>
                     </div>
@@ -275,6 +287,10 @@
                             <select id="budgetSubcategory" class="p-2 border rounded-md"></select>
                             <input type="number" step="0.01" id="budgetAmount" placeholder="Budgeted Amount" class="p-2 border rounded-md" required>
                             <select id="budgetPaymentMethod" class="p-2 border rounded-md"></select>
+                             <select id="budgetPayType" class="p-2 border rounded-md">
+                                <option value="Manual">Manual Pay</option>
+                                <option value="Auto">Auto Pay</option>
+                            </select>
                             <button type="submit" class="md:col-span-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Set/Update Budget</button>
                         </form>
                         <div class="mt-6">
@@ -286,6 +302,7 @@
                                             <th class="py-2 px-4 text-left">Category</th>
                                             <th class="py-2 px-4 text-left">Subcategory</th>
                                             <th class="py-2 px-4 text-left">Payment Method</th>
+                                            <th class="py-2 px-4 text-left">Pay Type</th>
                                             <th class="py-2 px-4 text-right">Amount</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
@@ -469,7 +486,7 @@
     <script>
         // --- DATABASE SETUP ---
         const DB_NAME = 'HomeBudgetDB';
-        const DB_VERSION = 2; // Incremented version
+        const DB_VERSION = 3; // Incremented version
         let db;
         let calendarDate = new Date();
 
@@ -631,6 +648,14 @@
                 document.getElementById('hamburger').addEventListener('click', () => {
                     document.getElementById('sidebar').classList.toggle('-translate-x-full');
                 });
+                
+                // Setup Calendar Toggle
+                document.getElementById('toggleCalendarBtn').addEventListener('click', () => {
+                    const calendarContainer = document.getElementById('calendarContainer');
+                    const btn = document.getElementById('toggleCalendarBtn');
+                    calendarContainer.classList.toggle('hidden');
+                    btn.textContent = calendarContainer.classList.contains('hidden') ? 'View Calendar' : 'Hide Calendar';
+                });
 
 
             } catch (error) {
@@ -675,7 +700,7 @@
                     source: document.getElementById('incomeSource').value,
                     type: document.getElementById('incomeType').value,
                     amount: parseFloat(document.getElementById('incomeAmount').value),
-                    date: document.getElementById('incomeType').value === 'one-time' ? document.getElementById('incomeDate').value : null
+                    date: document.getElementById('incomeDate').value
                 };
                 const id = document.getElementById('incomeId').value;
                 if (id) {
@@ -686,7 +711,6 @@
                 }
                 e.target.reset();
                 document.getElementById('incomeId').value = '';
-                document.getElementById('incomeDate').classList.add('hidden');
                 loadIncome();
                 updateDashboard();
             });
@@ -747,7 +771,8 @@
                     category: document.getElementById('budgetCategory').value,
                     subcategory: document.getElementById('budgetSubcategory').value,
                     amount: parseFloat(document.getElementById('budgetAmount').value),
-                    paymentMethod: document.getElementById('budgetPaymentMethod').value
+                    paymentMethod: document.getElementById('budgetPaymentMethod').value,
+                    payType: document.getElementById('budgetPayType').value
                 };
                 const id = document.getElementById('budgetId').value;
                 if(id){
@@ -829,7 +854,7 @@
                     <td class="border px-4 py-2">${income.name}</td>
                     <td class="border px-4 py-2">${income.source}</td>
                     <td class="border px-4 py-2">${income.type}</td>
-                    <td class="border px-4 py-2 text-right">$${income.amount.toFixed(2)}</td>
+                    <td class="border px-4 py-2 text-right">${formatCurrency(income.amount)}</td>
                     <td class="border px-4 py-2">${income.date || 'N/A'}</td>
                     <td class="border px-4 py-2 text-center">
                         <button onclick="editIncome(${income.id})" class="text-blue-500 hover:underline">Edit</button>
@@ -851,17 +876,7 @@
                 document.getElementById('incomeSource').value = income.source;
                 document.getElementById('incomeType').value = income.type;
                 document.getElementById('incomeAmount').value = income.amount;
-
-                const dateField = document.getElementById('incomeDate');
-                if (income.type === 'one-time') {
-                    dateField.classList.remove('hidden');
-                    dateField.required = true;
-                    dateField.value = income.date;
-                } else {
-                    dateField.classList.add('hidden');
-                    dateField.required = false;
-                    dateField.value = '';
-                }
+                document.getElementById('incomeDate').value = income.date;
             };
         }
 
@@ -895,7 +910,7 @@
                     <td class="border px-4 py-2">${expense.payee}</td>
                     <td class="border px-4 py-2">${expense.category} / ${expense.subcategory}</td>
                     <td class="border px-4 py-2">${expense.paymentType}</td>
-                    <td class="border px-4 py-2 text-right">$${expense.amount.toFixed(2)}</td>
+                    <td class="border px-4 py-2 text-right">${formatCurrency(expense.amount)}</td>
                     <td class="border px-4 py-2">${expense.date}</td>
                     <td class="border px-4 py-2 text-center">${actionsHTML}</td>
                 `;
@@ -935,13 +950,13 @@
             
             const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
             const totalCost = activeSubscriptions.reduce((sum, s) => sum + s.amount, 0);
-            document.getElementById('totalSubscriptionCost').textContent = `$${totalCost.toFixed(2)}`;
+            document.getElementById('totalSubscriptionCost').textContent = formatCurrency(totalCost);
 
             subscriptions.forEach(sub => {
                 const row = list.insertRow();
                 row.innerHTML = `
                     <td class="border px-4 py-2">${sub.name}</td>
-                    <td class="border px-4 py-2 text-right">$${sub.amount.toFixed(2)}</td>
+                    <td class="border px-4 py-2 text-right">${formatCurrency(sub.amount)}</td>
                     <td class="border px-4 py-2">${sub.startDate}</td>
                     <td class="border px-4 py-2">${sub.paymentMethod || 'N/A'}</td>
                     <td class="border px-4 py-2">${sub.status}</td>
@@ -1005,7 +1020,8 @@
                     <td class="border px-4 py-2">${budget.category}</td>
                     <td class="border px-4 py-2">${budget.subcategory}</td>
                     <td class="border px-4 py-2">${budget.paymentMethod || 'Any'}</td>
-                    <td class="border px-4 py-2 text-right">$${budget.amount.toFixed(2)}</td>
+                    <td class="border px-4 py-2">${budget.payType || 'Manual'}</td>
+                    <td class="border px-4 py-2 text-right">${formatCurrency(budget.amount)}</td>
                     <td class="border px-4 py-2 text-center">
                         <button onclick="editBudget(${budget.id})" class="text-blue-500 hover:underline">Edit</button>
                         <button onclick="deleteBudget(${budget.id})" class="text-red-500 hover:underline ml-2">Delete</button>
@@ -1024,7 +1040,8 @@
                     <td class="border px-4 py-2 font-semibold">Subscriptions</td>
                     <td class="border px-4 py-2">Recurring</td>
                     <td class="border px-4 py-2">Various</td>
-                    <td class="border px-4 py-2 text-right">$${totalSubscriptionCost.toFixed(2)}</td>
+                    <td class="border px-4 py-2">Auto</td>
+                    <td class="border px-4 py-2 text-right">${formatCurrency(totalSubscriptionCost)}</td>
                     <td class="border px-4 py-2 text-center text-sm text-gray-500">Auto</td>
                 `;
             }
@@ -1042,6 +1059,7 @@
                 handleCategoryChangeForEdit(budget.category, budget.subcategory, 'budgetSubcategory');
                 document.getElementById('budgetAmount').value = budget.amount;
                 document.getElementById('budgetPaymentMethod').value = budget.paymentMethod;
+                document.getElementById('budgetPayType').value = budget.payType;
             };
         }
 
@@ -1241,15 +1259,15 @@
 
             // Mobile Summary
             const summaryIncomeEl = document.getElementById('summaryIncome');
-            if(summaryIncomeEl) summaryIncomeEl.textContent = `$${totalIncome.toFixed(2)}`;
+            if(summaryIncomeEl) summaryIncomeEl.textContent = formatCurrency(totalIncome);
             const summaryExpensesEl = document.getElementById('summaryExpenses');
-            if(summaryExpensesEl) summaryExpensesEl.textContent = `$${totalExpenses.toFixed(2)}`;
+            if(summaryExpensesEl) summaryExpensesEl.textContent = formatCurrency(totalExpenses);
             const summaryBalanceEl = document.getElementById('summaryBalance');
-            if(summaryBalanceEl) summaryBalanceEl.textContent = `$${balance.toFixed(2)}`;
+            if(summaryBalanceEl) summaryBalanceEl.textContent = formatCurrency(balance);
 
             // Desktop Summary
             const desktopBalanceEl = document.getElementById('desktopBalance');
-            if(desktopBalanceEl) desktopBalanceEl.textContent = `$${balance.toFixed(2)}`;
+            if(desktopBalanceEl) desktopBalanceEl.textContent = formatCurrency(balance);
             
             const today = new Date();
             const currentMonthStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -1266,12 +1284,12 @@
 
             const desktopThisMonthEl = document.getElementById('desktopThisMonth');
             if(desktopThisMonthEl) {
-                desktopThisMonthEl.textContent = `$${thisMonthNet.toFixed(2)}`;
+                desktopThisMonthEl.textContent = formatCurrency(thisMonthNet);
                 desktopThisMonthEl.className = `text-2xl font-bold ${thisMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
             }
             const desktopLastMonthEl = document.getElementById('desktopLastMonth');
             if(desktopLastMonthEl) {
-                desktopLastMonthEl.textContent = `$${lastMonthNet.toFixed(2)}`;
+                desktopLastMonthEl.textContent = formatCurrency(lastMonthNet);
                 desktopLastMonthEl.className = `text-2xl font-bold ${lastMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
             }
 
@@ -1291,7 +1309,7 @@
                                 <p class="font-semibold">${exp.payee}</p>
                                 <p class="text-sm text-gray-500">${exp.date}</p>
                             </div>
-                            <p class="font-bold text-red-600">-$${exp.amount.toFixed(2)}</p>
+                            <p class="font-bold text-red-600">-${formatCurrency(exp.amount)}</p>
                         `;
                         list.appendChild(li);
                     });
@@ -1315,7 +1333,7 @@
                     div.innerHTML = `
                         <div class="flex justify-between mb-1">
                             <span class="font-semibold">${budget.category} / ${budget.subcategory}</span>
-                            <span>$${actualSpend.toFixed(2)} / $${budget.amount.toFixed(2)}</span>
+                            <span>${formatCurrency(actualSpend)} / ${formatCurrency(budget.amount)}</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5">
                             <div class="bg-green-600 h-2.5 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
@@ -1330,7 +1348,7 @@
                     div.innerHTML = `
                         <div class="flex justify-between mb-1">
                             <span class="font-semibold">Subscriptions</span>
-                            <span>$${subCost.toFixed(2)}</span>
+                            <span>${formatCurrency(subCost)}</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5">
                             <div class="bg-blue-600 h-2.5 rounded-full" style="width: 100%"></div>
@@ -1353,8 +1371,11 @@
                         const li = document.createElement('li');
                         li.className = 'flex justify-between items-center';
                         li.innerHTML = `
-                            <p class="font-semibold">${item.name || `${item.category} / ${item.subcategory}`}</p>
-                            <p class="font-bold">$${item.amount.toFixed(2)}</p>
+                            <div>
+                                <p class="font-semibold">${item.name || `${item.category} / ${item.subcategory}`}</p>
+                                <p class="text-sm text-gray-500">${item.paymentMethod || 'N/A'} - ${item.payType || 'Auto'}</p>
+                            </div>
+                            <p class="font-bold">${formatCurrency(item.amount)}</p>
                         `;
                         list.appendChild(li);
                     });
@@ -1404,9 +1425,9 @@
             
             const remaining = recurringIncome - totalBudgeted;
 
-            document.getElementById('summaryRecurringIncome').textContent = `$${recurringIncome.toFixed(2)}`;
-            document.getElementById('summaryTotalBudgeted').textContent = `$${totalBudgeted.toFixed(2)}`;
-            document.getElementById('summaryBudgetRemaining').textContent = `$${remaining.toFixed(2)}`;
+            document.getElementById('summaryRecurringIncome').textContent = formatCurrency(recurringIncome);
+            document.getElementById('summaryTotalBudgeted').textContent = formatCurrency(totalBudgeted);
+            document.getElementById('summaryBudgetRemaining').textContent = formatCurrency(remaining);
             
             const remainingEl = document.getElementById('summaryBudgetRemaining');
             const remainingContainer = remainingEl.parentElement;
@@ -1444,7 +1465,7 @@
             for (const method in paymentTotals) {
                 const item = document.createElement('div');
                 item.className = 'bg-gray-100 p-2 rounded-md';
-                item.innerHTML = `<p class="font-semibold">${method}</p><p>$${paymentTotals[method].toFixed(2)}</p>`;
+                item.innerHTML = `<p class="font-semibold">${method}</p><p>${formatCurrency(paymentTotals[method])}</p>`;
                 list.appendChild(item);
             }
             summaryEl.appendChild(list);
@@ -1490,15 +1511,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                     <div class="p-4 bg-green-100 rounded-lg">
                         <p class="text-sm text-green-800">Total Income</p>
-                        <p class="text-2xl font-bold text-green-600">$${totalMonthlyIncome.toFixed(2)}</p>
+                        <p class="text-2xl font-bold text-green-600">${formatCurrency(totalMonthlyIncome)}</p>
                     </div>
                     <div class="p-4 bg-red-100 rounded-lg">
                         <p class="text-sm text-red-800">Total Expenses</p>
-                        <p class="text-2xl font-bold text-red-600">$${totalMonthlyExpenses.toFixed(2)}</p>
+                        <p class="text-2xl font-bold text-red-600">${formatCurrency(totalMonthlyExpenses)}</p>
                     </div>
                     <div class="p-4 rounded-lg ${netBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'}">
                         <p class="text-sm ${netBalance >= 0 ? 'text-blue-800' : 'text-orange-800'}">Net Balance</p>
-                        <p class="text-2xl font-bold ${netBalance >= 0 ? 'text-blue-600' : 'text-orange-600'}">$${netBalance.toFixed(2)}</p>
+                        <p class="text-2xl font-bold ${netBalance >= 0 ? 'text-blue-600' : 'text-orange-600'}">${formatCurrency(netBalance)}</p>
                     </div>
                 </div>
             `;
@@ -1546,17 +1567,17 @@
                                 <tr>
                                     <td class="border px-4 py-2">${item.category}</td>
                                     <td class="border px-4 py-2">${item.subcategory}</td>
-                                    <td class="border px-4 py-2 text-right">$${item.amount.toFixed(2)}</td>
-                                    <td class="border px-4 py-2 text-right">$${item.actualSpend.toFixed(2)}</td>
-                                    <td class="border px-4 py-2 text-right font-medium ${diffClass}">$${difference.toFixed(2)}</td>
+                                    <td class="border px-4 py-2 text-right">${formatCurrency(item.amount)}</td>
+                                    <td class="border px-4 py-2 text-right">${formatCurrency(item.actualSpend)}</td>
+                                    <td class="border px-4 py-2 text-right font-medium ${diffClass}">${formatCurrency(difference)}</td>
                                 </tr>
                             `;
                         }).join('')}
                          <tr class="font-bold bg-gray-100">
                             <td class="border px-4 py-2" colspan="2">Total</td>
-                            <td class="border px-4 py-2 text-right">$${totalBudgeted.toFixed(2)}</td>
-                            <td class="border px-4 py-2 text-right">$${totalMonthlyExpenses.toFixed(2)}</td>
-                            <td class="border px-4 py-2 text-right ${totalBudgeted - totalMonthlyExpenses >= 0 ? 'text-green-600' : 'text-red-600'}">$${(totalBudgeted - totalMonthlyExpenses).toFixed(2)}</td>
+                            <td class="border px-4 py-2 text-right">${formatCurrency(totalBudgeted)}</td>
+                            <td class="border px-4 py-2 text-right">${formatCurrency(totalMonthlyExpenses)}</td>
+                            <td class="border px-4 py-2 text-right ${totalBudgeted - totalMonthlyExpenses >= 0 ? 'text-green-600' : 'text-red-600'}">${formatCurrency(totalBudgeted - totalMonthlyExpenses)}</td>
                         </tr>
                     </tbody>
                 `;
@@ -1578,7 +1599,7 @@
                 ul.className = 'list-disc list-inside';
                 for (const category in categorySpend) {
                     const li = document.createElement('li');
-                    li.textContent = `${category}: $${categorySpend[category].toFixed(2)}`;
+                    li.textContent = `${category}: ${formatCurrency(categorySpend[category])}`;
                     ul.appendChild(li);
                 }
                 categorySpendReportEl.appendChild(ul);
@@ -1598,7 +1619,7 @@
                 ul.className = 'list-disc list-inside';
                 for (const type in paymentTypeSpend) {
                     const li = document.createElement('li');
-                    li.textContent = `${type}: $${paymentTypeSpend[type].toFixed(2)}`;
+                    li.textContent = `${type}: ${formatCurrency(paymentTypeSpend[type])}`;
                     ul.appendChild(li);
                 }
                 paymentTypeSpendReportEl.appendChild(ul);
@@ -1683,7 +1704,7 @@
                     itemsHTML = '<ul class="text-xs text-left mt-1 space-y-0.5 overflow-y-auto max-h-16">';
                     itemsForDay.forEach(item => {
                         const colorClass = item.isSubscription ? 'text-blue-600' : 'text-red-600';
-                        itemsHTML += `<li class="truncate ${colorClass}"><span class="font-semibold">$${item.amount.toFixed(2)}</span> ${item.payee}</li>`;
+                        itemsHTML += `<li class="truncate ${colorClass}"><span class="font-semibold">${formatCurrency(item.amount)}</span> ${item.payee}</li>`;
                     });
                     itemsHTML += '</ul>';
                 }
@@ -1761,7 +1782,7 @@
             if (!expense) return;
 
             document.getElementById('itemizationModalTitle').textContent = `Itemize: ${expense.payee}`;
-            document.getElementById('itemizationTotal').textContent = `$${expense.amount.toFixed(2)}`;
+            document.getElementById('itemizationTotal').textContent = formatCurrency(expense.amount);
             
             await renderItemizedList(expense);
 
@@ -1780,7 +1801,7 @@
                     li.innerHTML = `
                         <span>${item.name}</span>
                         <div>
-                            <span class="font-medium mr-4">$${item.amount.toFixed(2)}</span>
+                            <span class="font-medium mr-4">${formatCurrency(item.amount)}</span>
                             <button onclick="deleteItemizedEntry(${expense.id}, ${index})" class="text-red-500 hover:underline">x</button>
                         </div>
                     `;
@@ -1791,7 +1812,7 @@
             
             const remaining = expense.amount - itemizedTotal;
             const remainingEl = document.getElementById('itemizationRemaining');
-            remainingEl.textContent = `$${remaining.toFixed(2)}`;
+            remainingEl.textContent = formatCurrency(remaining);
             remainingEl.className = 'font-bold text-lg ';
             remainingEl.classList.add(remaining < 0 ? 'text-red-500' : 'text-green-600');
         }
@@ -1975,7 +1996,7 @@
                 ul.className = 'list-disc list-inside';
                 for (const category in categorySpend) {
                     const li = document.createElement('li');
-                    li.textContent = `${category}: $${categorySpend[category].toFixed(2)}`;
+                    li.textContent = `${category}: ${formatCurrency(categorySpend[category])}`;
                     ul.appendChild(li);
                 }
                 categoryEl.appendChild(ul);
@@ -1996,7 +2017,7 @@
                 ul.className = 'list-disc list-inside';
                 for (const sub in subcategorySpend) {
                     const li = document.createElement('li');
-                    li.textContent = `${sub}: $${subcategorySpend[sub].toFixed(2)}`;
+                    li.textContent = `${sub}: ${formatCurrency(subcategorySpend[sub])}`;
                     ul.appendChild(li);
                 }
                 subcategoryEl.appendChild(ul);
@@ -2036,7 +2057,7 @@
                                 <tr>
                                     <td class="border px-4 py-2">${item.date}</td>
                                     <td class="border px-4 py-2">${item.payee}</td>
-                                    <td class="border px-4 py-2 text-right">$${item.amount.toFixed(2)}</td>
+                                    <td class="border px-4 py-2 text-right">${formatCurrency(item.amount)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -2048,6 +2069,15 @@
             } else {
                 priceTrackerEl.innerHTML = '<p>Select an item to see its price history.</p>';
             }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(Math.round(amount));
         }
 
     </script>
