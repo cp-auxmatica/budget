@@ -135,6 +135,10 @@
                 <!-- Income View -->
                 <div id="incomeView" class="view hidden">
                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-blue-800">Income Summary</h3>
+                            <div id="incomeSummary" class="grid grid-cols-2 gap-4 mt-2"></div>
+                        </div>
                         <h2 class="text-2xl font-bold mb-4">Manage Income</h2>
                         <form id="incomeForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                             <input type="hidden" id="incomeId">
@@ -688,8 +692,8 @@
                     dateField.classList.remove('hidden');
                     dateField.required = true;
                 } else {
-                    dateField.classList.add('hidden');
-                    dateField.required = false;
+                    dateField.classList.remove('hidden'); // Always visible
+                    dateField.required = true;
                 }
             });
 
@@ -847,8 +851,21 @@
         async function loadIncome() {
             const incomes = await getAllObjects('income');
             const list = document.getElementById('incomeList');
+            const summaryEl = document.getElementById('incomeSummary');
             list.innerHTML = '';
+            
+            let recurringTotal = 0;
+            let oneTimeTotal = 0;
+            const sourceTotals = {};
+
             incomes.forEach(income => {
+                if (income.type === 'recurring') {
+                    recurringTotal += income.amount;
+                } else {
+                    oneTimeTotal += income.amount;
+                }
+                sourceTotals[income.source] = (sourceTotals[income.source] || 0) + income.amount;
+
                 const row = list.insertRow();
                 row.innerHTML = `
                     <td class="border px-4 py-2">${income.name}</td>
@@ -862,6 +879,15 @@
                     </td>
                 `;
             });
+
+            summaryEl.innerHTML = `
+                <div><p class="font-semibold">Recurring Total:</p> <p class="text-lg">${formatCurrency(recurringTotal)}</p></div>
+                <div><p class="font-semibold">One-Time Total:</p> <p class="text-lg">${formatCurrency(oneTimeTotal)}</p></div>
+            `;
+            for(const source in sourceTotals) {
+                summaryEl.innerHTML += `<div><p class="font-semibold">${source}:</p> <p class="text-lg">${formatCurrency(sourceTotals[source])}</p></div>`;
+            }
+
             await updateBudgetSummary();
         }
 
@@ -1526,7 +1552,7 @@
             
             // --- 2. Budget vs. Actual Report ---
             budgetActualReportEl.innerHTML = ''; 
-            const totalBudgeted = allBudgets.reduce((sum, b) => sum + b.amount, 0);
+            const totalBudgeted = allBudgets.reduce((sum, b) => sum + b.amount, 0) + totalSubscriptionCost;
             
             const reportData = allBudgets.map(budget => {
                 const actualSpend = monthlyExpenses
@@ -1539,7 +1565,7 @@
                 reportData.push({
                     category: 'Subscriptions',
                     subcategory: 'Recurring',
-                    amount: 0, 
+                    amount: totalSubscriptionCost, 
                     actualSpend: totalSubscriptionCost
                 });
             }
