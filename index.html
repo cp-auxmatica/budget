@@ -45,24 +45,30 @@
         <aside id="sidebar" class="w-64 bg-gray-800 text-white p-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30">
             <h2 class="text-2xl font-bold mb-6 text-center">Fast Budget</h2>
             <nav id="mainNav">
-                <a href="#" onclick="showView('dashboardView', this)" class="nav-link active-nav flex items-center px-4 py-2 rounded-md hover:bg-gray-700">Dashboard</a>
-                <a href="#" onclick="showView('incomeView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Income</a>
-                <a href="#" onclick="showView('expensesView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Expenses</a>
-                <a href="#" onclick="showView('subscriptionsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Subscriptions</a>
-                <a href="#" onclick="showView('budgetsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Budgets</a>
-                <a href="#" onclick="showView('pointsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Points</a>
-                <a href="#" onclick="showView('reportsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Reports</a>
-                <a href="#" onclick="showView('settingsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">Settings</a>
+                <a href="#" onclick="showView('dashboardView', this)" class="nav-link active-nav flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>Dashboard</a>
+                <a href="#" onclick="showView('incomeView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0 1H9.5M12 6h2.5m-2.5 11l-3 3m0 0l-3-3m3 3v-6m6 3l3 3m0 0l3-3m-3 3v-6"></path></svg>Income</a>
+                <a href="#" onclick="showView('expensesView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>Expenses</a>
+                <a href="#" onclick="showView('subscriptionsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5V4H4zm0 11h5v5H4v-5zm11-11h5v5h-5V4zm0 11h5v5h-5v-5z"></path></svg>Subscriptions</a>
+                <a href="#" onclick="showView('budgetsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5a.5.5 0 11-1 0 .5.5 0 011 0zM17 12h-1m-1 1v-1m5-1.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z"></path></svg>Budgets</a>
+                <a href="#" onclick="showView('pointsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l-3 3m0 0l-3-3m3 3V1m6 4l3 3m0 0l-3 3m3-3H9m12 5l-3 3m0 0l-3-3m3 3v-4m-6 6l-3 3m0 0l-3-3m3 3v-4"></path></svg>Points</a>
+                <a href="#" onclick="showView('reportsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2z"></path></svg>Reports</a>
+                <a href="#" onclick="showView('settingsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Settings</a>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <header class="bg-white shadow-md p-4 flex items-center justify-between">
-                <button id="hamburger" class="md:hidden text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+                 <div class="flex items-center">
+                    <button id="hamburger" class="md:hidden text-gray-600 mr-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                    <a href="#" id="homeLink" onclick="showView('dashboardView', document.querySelector('[onclick*=\'dashboardView\']'))" class="text-gray-600 hover:text-blue-600 hidden">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    </a>
+                </div>
                 <h1 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                <div></div> <!-- Spacer -->
             </header>
             
             <main id="app" class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 sm:p-6 lg:p-8">
