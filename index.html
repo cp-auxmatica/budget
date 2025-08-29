@@ -6,7 +6,6 @@
     <title>Home Budget App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heroicons@1.0.6/dist/outline.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -39,6 +38,23 @@
         }
         th[data-sort] {
             cursor: pointer;
+            user-select: none;
+        }
+        th[data-sort].sort-asc::after,
+        th[data-sort].sort-desc::after {
+            content: '';
+            display: inline-block;
+            margin-left: 0.5em;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+        }
+        th[data-sort].sort-asc::after {
+            border-bottom: 5px solid currentColor;
+        }
+        th[data-sort].sort-desc::after {
+            border-top: 5px solid currentColor;
         }
     </style>
 </head>
@@ -49,14 +65,38 @@
         <aside id="sidebar" class="w-64 bg-gray-800 text-white p-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30">
             <h2 class="text-2xl font-bold mb-6 text-center">Fast Budget</h2>
             <nav id="mainNav">
-                <a href="#" onclick="showView('dashboardView', this)" class="nav-link active-nav flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="home"></i>Dashboard</a>
-                <a href="#" onclick="showView('incomeView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="trending-up"></i>Income</a>
-                <a href="#" onclick="showView('expensesView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="trending-down"></i>Expenses</a>
-                <a href="#" onclick="showView('subscriptionsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="refresh-cw"></i>Subscriptions</a>
-                <a href="#" onclick="showView('budgetsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="target"></i>Budgets</a>
-                <a href="#" onclick="showView('pointsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="star"></i>Points</a>
-                <a href="#" onclick="showView('reportsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="bar-chart-2"></i>Reports</a>
-                <a href="#" onclick="showView('settingsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700"><i class="h-5 w-5 mr-3" data-feather="settings"></i>Settings</a>
+                <a href="#" onclick="showView('dashboardView', this)" class="nav-link active-nav flex items-center px-4 py-2 rounded-md hover:bg-gray-700">
+                    <i data-feather="home" class="w-5 h-5 mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="#" onclick="showView('incomeView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">
+                     <i data-feather="trending-up" class="w-5 h-5 mr-3"></i>
+                    Income
+                </a>
+                <a href="#" onclick="showView('expensesView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">
+                    <i data-feather="trending-down" class="w-5 h-5 mr-3"></i>
+                    Expenses
+                </a>
+                <a href="#" onclick="showView('subscriptionsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">
+                     <i data-feather="repeat" class="w-5 h-5 mr-3"></i>
+                    Subscriptions
+                </a>
+                <a href="#" onclick="showView('budgetsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">
+                    <i data-feather="target" class="w-5 h-5 mr-3"></i>
+                    Budgets
+                </a>
+                <a href="#" onclick="showView('pointsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">
+                    <i data-feather="star" class="w-5 h-5 mr-3"></i>
+                    Points
+                </a>
+                <a href="#" onclick="showView('reportsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">
+                    <i data-feather="bar-chart-2" class="w-5 h-5 mr-3"></i>
+                    Reports
+                </a>
+                <a href="#" onclick="showView('settingsView', this)" class="nav-link flex items-center px-4 py-2 mt-2 rounded-md hover:bg-gray-700">
+                    <i data-feather="settings" class="w-5 h-5 mr-3"></i>
+                    Settings
+                </a>
             </nav>
         </aside>
 
@@ -65,10 +105,10 @@
             <header class="bg-white shadow-md p-4 flex items-center justify-between">
                  <div class="flex items-center">
                     <button id="hamburger" class="md:hidden text-gray-600 mr-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        <i data-feather="menu" class="w-6 h-6"></i>
                     </button>
                     <a href="#" id="homeLink" onclick="showView('dashboardView', document.querySelector('[onclick*=\'dashboardView\']'))" class="text-gray-600 hover:text-blue-600 hidden">
-                        <i class="h-6 w-6" data-feather="home"></i>
+                        <i data-feather="home" class="w-6 h-6"></i>
                     </a>
                 </div>
                 <h1 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h1>
@@ -80,8 +120,8 @@
                 <div id="dashboardView" class="view">
                     <!-- Desktop View -->
                     <div class="hidden md:grid md:grid-cols-3 md:gap-6">
-                        <div class="col-span-2">
-                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="col-span-2 space-y-6">
+                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div class="bg-white p-4 rounded-lg shadow">
                                     <h4 class="text-gray-500">Balance</h4>
                                     <p id="desktopBalance" class="text-2xl font-bold">$0</p>
@@ -97,11 +137,15 @@
                             </div>
                             <div class="bg-white p-6 rounded-lg shadow">
                                 <h3 class="text-xl font-semibold mb-4">Upcoming & Recent Transactions</h3>
-                                <div id="desktopTransactionsList"></div>
+                                <div id="desktopTransactionsList" class="max-h-96 overflow-y-auto"></div>
                             </div>
                         </div>
-                        <div class="col-span-1">
-                            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="col-span-1 space-y-6">
+                             <div class="bg-white p-6 rounded-lg shadow">
+                                <h3 class="text-xl font-semibold mb-4">Spend by Category (This Month)</h3>
+                                <div id="desktopSpendByCategory" class="space-y-4"></div>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow">
                                 <h3 class="text-xl font-semibold mb-4">Budgets</h3>
                                 <div id="desktopBudgets" class="space-y-4"></div>
                             </div>
@@ -112,8 +156,8 @@
                         </div>
                     </div>
                     <!-- Mobile View -->
-                    <div class="md:hidden">
-                         <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <div class="md:hidden space-y-6">
+                         <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-2">Monthly Summary</h3>
                             <div id="mobileSummary" class="grid grid-cols-3 gap-4 text-center mb-4">
                                 <div class="p-2 bg-green-100 rounded-lg">
@@ -134,6 +178,10 @@
                                 <a href="https://chase.com" target="_blank" class="flex-1 text-center py-2 bg-gray-200 rounded-md">Chase</a>
                                 <button onclick="showView('pointsView', document.querySelector('[onclick*=\'pointsView\']'))" class="flex-1 text-center py-2 bg-gray-200 rounded-md">Points</button>
                             </div>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-2">Spend by Category (This Month)</h3>
+                            <div id="mobileSpendByCategory" class="space-y-4"></div>
                         </div>
                          <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-2">Upcoming & Recent Transactions</h3>
@@ -319,6 +367,7 @@
                                             <th class="py-2 px-4 text-left" data-sort="subcategory">Subcategory</th>
                                             <th class="py-2 px-4 text-left" data-sort="paymentMethod">Payment Method</th>
                                             <th class="py-2 px-4 text-left" data-sort="payType">Pay Type</th>
+                                            <th class="py-2 px-4 text-right" data-sort="dueDay">Due Day</th>
                                             <th class="py-2 px-4 text-right" data-sort="amount">Amount</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
@@ -658,13 +707,13 @@
             document.getElementById(viewId).classList.remove('hidden');
 
             // Update page title
-            document.getElementById('pageTitle').textContent = element.textContent;
+            document.getElementById('pageTitle').textContent = element ? element.textContent.trim() : 'Dashboard';
 
             // Update active nav link
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active-nav', 'bg-blue-600');
             });
-            element.classList.add('active-nav', 'bg-blue-600');
+             if(element) element.classList.add('active-nav', 'bg-blue-600');
 
             // Show/Hide Home Link
             document.getElementById('homeLink').classList.toggle('hidden', viewId === 'dashboardView');
@@ -681,10 +730,12 @@
             try {
                 await initDb();
                 
+                await seedInitialData();
                 await reloadAllData();
 
                 // Set up forms
                 setupForms();
+                setupTableSorting();
 
                 // Set up reports
                 document.getElementById('reportMonth').addEventListener('change', generateReports);
@@ -722,8 +773,6 @@
                     btn.textContent = calendarContainer.classList.contains('hidden') ? 'View Calendar' : 'Hide Calendar';
                 });
 
-                feather.replace();
-
             } catch (error) {
                 console.error("Initialization failed:", error);
                 showNotification("App failed to initialize. Check console.", true);
@@ -745,6 +794,7 @@
             await generateYearlyReports();
             await renderExpenseCalendar(calendarDate.getFullYear(), calendarDate.getMonth());
             await updateBudgetSummary();
+            feather.replace();
         }
 
         function setupForms() {
@@ -841,7 +891,7 @@
                     amount: parseFloat(document.getElementById('budgetAmount').value),
                     paymentMethod: document.getElementById('budgetPaymentMethod').value,
                     payType: document.getElementById('budgetPayType').value,
-                    dueDay: parseInt(document.getElementById('budgetDueDay').value)
+                    dueDay: parseInt(document.getElementById('budgetDueDay').value) || null
                 };
                 const id = document.getElementById('budgetId').value;
                 if(id){
@@ -1134,6 +1184,7 @@
                     <td class="border px-4 py-2">${budget.subcategory}</td>
                     <td class="border px-4 py-2">${budget.paymentMethod || 'Any'}</td>
                     <td class="border px-4 py-2">${budget.payType || 'Manual'}</td>
+                    <td class="border px-4 py-2 text-right">${budget.dueDay || 'N/A'}</td>
                     <td class="border px-4 py-2 text-right">${formatCurrency(budget.amount)}</td>
                     <td class="border px-4 py-2 text-center">
                         <button onclick="editBudget(${budget.id})" class="text-blue-500 hover:underline">Edit</button>
@@ -1154,6 +1205,7 @@
                     <td class="border px-4 py-2">Recurring</td>
                     <td class="border px-4 py-2">Various</td>
                     <td class="border px-4 py-2">Auto</td>
+                    <td class="border px-4 py-2 text-right">Varies</td>
                     <td class="border px-4 py-2 text-right">${formatCurrency(totalSubscriptionCost)}</td>
                     <td class="border px-4 py-2 text-center text-sm text-gray-500">Auto</td>
                 `;
@@ -1203,8 +1255,11 @@
             methods.forEach(method => {
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center p-2 border-b';
-                li.innerHTML = `
-                    <span>${method.name} (${method.type})</span>
+                 li.innerHTML = `
+                    <span class="flex items-center">
+                        <i class="h-5 w-5 mr-2 text-gray-500" data-feather="${method.type === 'Credit Card' ? 'credit-card' : 'briefcase'}"></i>
+                        ${method.name} (${method.type})
+                    </span>
                     <div>
                         <button onclick="editPaymentMethod(${method.id})" class="text-blue-500 hover:underline">Edit</button>
                         <button onclick="deletePaymentMethod(${method.id})" class="text-red-500 hover:underline ml-2">Delete</button>
@@ -1220,6 +1275,7 @@
                     select.appendChild(option.cloneNode(true))
                 });
             });
+             feather.replace();
         }
 
         async function editPaymentMethod(id) {
@@ -1255,13 +1311,34 @@
             selects.forEach(select => {
                 select.innerHTML = '<option value="">Select Category</option>';
             });
-
+            
+            // Default categories
+            const defaultCategories = {
+                'Home': 'home', 'Food': 'shopping-cart', 'School': 'book-open', 'Auto': 'truck', 
+                'Subscriptions': 'repeat', 'Entertainment': 'film', 'Phone': 'smartphone', 
+                'Internet': 'wifi', 'Projects': 'tool', 'Health': 'heart', 'Shopping': 'tag', 'Travel': 'map-pin'
+            };
             categories.forEach(cat => {
+                 const icon = defaultCategories[cat.name] || 'folder';
                 const div = document.createElement('div');
                 div.className = 'p-2 border-b';
+
+                let subcategoryHTML = cat.subcategories.map(sub => `
+                    <li class="flex items-center justify-between">
+                        <span class="subcategory-name">- ${sub}</span>
+                        <div>
+                            <button onclick="startEditSubcategory(this, ${cat.id}, '${sub}')" class="text-blue-500 text-xs p-1">edit</button>
+                            <button onclick="deleteSubcategory(${cat.id}, '${sub}')" class="text-red-500 text-xs p-1">x</button>
+                        </div>
+                    </li>`).join('');
+
                 div.innerHTML = `
                     <div class="flex justify-between items-center">
-                        <span class="font-semibold">${cat.name}</span>
+                        <span class="font-semibold flex items-center">
+                            <i class="h-5 w-5 mr-2 text-gray-500" data-feather="${icon}"></i>
+                            <span class="category-name">${cat.name}</span>
+                             <button onclick="startEditCategory(this, ${cat.id})" class="text-blue-500 hover:underline ml-2 text-xs p-1">edit</button>
+                        </span>
                         <button onclick="deleteCategory(${cat.id})" class="text-red-500 hover:underline">Delete</button>
                     </div>
                     <form class="subcategoryForm mt-2" data-category-id="${cat.id}">
@@ -1269,7 +1346,7 @@
                         <button type="submit" class="px-2 py-1 bg-green-500 text-white rounded-md text-sm">Add</button>
                     </form>
                     <ul class="ml-4 mt-2">
-                        ${cat.subcategories.map(sub => `<li>- ${sub} <button onclick="deleteSubcategory(${cat.id}, '${sub}')" class="text-red-500 text-xs">x</button></li>`).join('')}
+                        ${subcategoryHTML}
                     </ul>
                 `;
                 list.appendChild(div);
@@ -1279,6 +1356,7 @@
                 option.textContent = cat.name;
                 selects.forEach(select => select.appendChild(option.cloneNode(true)));
             });
+             feather.replace();
 
             document.querySelectorAll('.subcategoryForm').forEach(form => {
                 form.addEventListener('submit', async (e) => {
@@ -1374,158 +1452,259 @@
             const budgets = await getAllObjects('budgets');
             const subscriptions = await getAllObjects('subscriptions');
 
+            updateDashboardSummaryCards(incomes, expenses);
+            renderDashboardTransactions(budgets, subscriptions, expenses);
+            updateDashboardDesktopBudgets(budgets, subscriptions, expenses);
+            updateDashboardBirthdays(people);
+            updateDashboardSpendByCategory(expenses);
+        }
+        
+        async function renderDashboardTransactions(budgets, subscriptions, expenses) {
+            const mobileList = document.getElementById('mobileTransactionsList');
+            const desktopList = document.getElementById('desktopTransactionsList');
+            mobileList.innerHTML = '';
+            desktopList.innerHTML = '';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const sevenDaysLater = new Date(today);
+            sevenDaysLater.setDate(today.getDate() + 7);
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(today.getDate() - 7);
+
+            let transactions = [];
+
+            // Upcoming Budgets
+            budgets.forEach(b => {
+                if (b.dueDay) {
+                    const dueDate = new Date(today.getFullYear(), today.getMonth(), b.dueDay);
+                    if (dueDate >= today && dueDate <= sevenDaysLater) {
+                        transactions.push({
+                            date: dueDate.toISOString().slice(0, 10),
+                            description: `${b.category} / ${b.subcategory}`,
+                            amount: b.amount,
+                            type: 'upcoming'
+                        });
+                    }
+                }
+            });
+
+            // Upcoming Subscriptions
+            const activeSubs = subscriptions.filter(s => s.status === 'active');
+            activeSubs.forEach(s => {
+                const subDate = new Date(s.startDate);
+                const subDay = subDate.getDate();
+                
+                let nextDueDate = new Date(today.getFullYear(), today.getMonth(), subDay);
+                if(nextDueDate < today) {
+                    nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+                }
+
+                if (nextDueDate >= today && nextDueDate <= sevenDaysLater) {
+                     transactions.push({
+                        date: nextDueDate.toISOString().slice(0, 10),
+                        description: s.name,
+                        amount: s.amount,
+                        type: 'upcoming'
+                    });
+                }
+            });
+
+
+            // Recent Expenses
+            expenses.forEach(e => {
+                const expenseDate = new Date(e.date + 'T00:00:00');
+                if (expenseDate <= today && expenseDate >= sevenDaysAgo) {
+                    transactions.push({
+                        date: e.date,
+                        description: e.payee,
+                        amount: e.amount,
+                        type: 'recent'
+                    });
+                }
+            });
+            
+            // Sort transactions by date
+            transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Group transactions by date
+            const grouped = transactions.reduce((acc, t) => {
+                (acc[t.date] = acc[t.date] || []).push(t);
+                return acc;
+            }, {});
+            
+            let html = '';
+            if (Object.keys(grouped).length === 0) {
+                html = '<p class="text-gray-500">No transactions in the next or last 7 days.</p>';
+            } else {
+                 for (const dateStr in grouped) {
+                    const date = new Date(dateStr + 'T00:00:00');
+                    const isToday = date.toDateString() === today.toDateString();
+                    const dateHeader = isToday ? 'Today' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    
+                    html += `<div class="mt-4"><p class="font-bold text-gray-700">${dateHeader}</p><ul class="mt-1 space-y-2">`;
+                    
+                    grouped[dateStr].forEach(t => {
+                        const amountClass = t.type === 'upcoming' ? 'text-yellow-600' : 'text-red-600';
+                         html += `
+                            <li class="flex justify-between items-center bg-white p-2 rounded-md shadow-sm">
+                                <span>${t.description}</span>
+                                <span class="font-semibold ${amountClass}">${formatCurrency(t.amount)}</span>
+                            </li>
+                        `;
+                    });
+
+                    html += '</ul></div>';
+                 }
+            }
+            
+            mobileList.innerHTML = html;
+            desktopList.innerHTML = html;
+        }
+
+
+        function updateDashboardSummaryCards(incomes, expenses) {
             const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
             const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
             const balance = totalIncome - totalExpenses;
-
-            // Mobile Summary
-            const summaryIncomeEl = document.getElementById('summaryIncome');
-            if(summaryIncomeEl) summaryIncomeEl.textContent = formatCurrency(totalIncome);
-            const summaryExpensesEl = document.getElementById('summaryExpenses');
-            if(summaryExpensesEl) summaryExpensesEl.textContent = formatCurrency(totalExpenses);
-            const summaryBalanceEl = document.getElementById('summaryBalance');
-            if(summaryBalanceEl) summaryBalanceEl.textContent = formatCurrency(balance);
-
-            // Desktop Summary
-            const desktopBalanceEl = document.getElementById('desktopBalance');
-            if(desktopBalanceEl) desktopBalanceEl.textContent = formatCurrency(balance);
             
             const today = new Date();
             const currentMonthStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
             const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
             const lastMonthStr = `${lastMonthDate.getFullYear()}-${(lastMonthDate.getMonth() + 1).toString().padStart(2, '0')}`;
-
+            
             const thisMonthIncome = incomes.filter(i => (i.type === 'recurring') || (i.date && i.date.startsWith(currentMonthStr))).reduce((sum, i) => sum + i.amount, 0);
             const thisMonthExpenses = expenses.filter(e => e.date.startsWith(currentMonthStr)).reduce((sum, e) => sum + e.amount, 0);
             const thisMonthNet = thisMonthIncome - thisMonthExpenses;
             
-            const lastMonthIncome = incomes.filter(i => (i.type === 'recurring') || (i.date && i.date.startsWith(lastMonthStr))).reduce((sum, i) => sum + i.amount, 0);
-            const lastMonthExpenses = expenses.filter(e => e.date.startsWith(lastMonthStr)).reduce((sum, e) => sum + e.amount, 0);
-            const lastMonthNet = lastMonthIncome - lastMonthExpenses;
-
-            const desktopThisMonthEl = document.getElementById('desktopThisMonth');
-            if(desktopThisMonthEl) {
-                desktopThisMonthEl.textContent = formatCurrency(thisMonthNet);
-                desktopThisMonthEl.className = `text-2xl font-bold ${thisMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
-            }
-            const desktopLastMonthEl = document.getElementById('desktopLastMonth');
-            if(desktopLastMonthEl) {
-                desktopLastMonthEl.textContent = formatCurrency(lastMonthNet);
-                desktopLastMonthEl.className = `text-2xl font-bold ${lastMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            const lastMonthIncomeEntries = incomes.filter(i => (i.type === 'recurring') || (i.date && i.date.startsWith(lastMonthStr)));
+            const lastMonthExpenseEntries = expenses.filter(e => e.date.startsWith(lastMonthStr));
+            let lastMonthNet = 0;
+            if (lastMonthIncomeEntries.length > 0 || lastMonthExpenseEntries.length > 0) {
+                 const lastMonthIncome = lastMonthIncomeEntries.reduce((sum, i) => sum + i.amount, 0);
+                 const lastMonthExpenses = lastMonthExpenseEntries.reduce((sum, e) => sum + e.amount, 0);
+                 lastMonthNet = lastMonthIncome - lastMonthExpenses;
             }
 
-            // Desktop Recent Transactions
-            const desktopRecentTransactionsEl = document.getElementById('desktopRecentTransactions');
-            if (desktopRecentTransactionsEl) {
-                desktopRecentTransactionsEl.innerHTML = '';
-                const recentExpenses = expenses.sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-                if (recentExpenses.length > 0) {
-                    const list = document.createElement('ul');
-                    list.className = 'space-y-3';
-                    recentExpenses.forEach(exp => {
-                        const li = document.createElement('li');
-                        li.className = 'flex justify-between items-center';
-                        li.innerHTML = `
-                            <div>
-                                <p class="font-semibold">${exp.payee}</p>
-                                <p class="text-sm text-gray-500">${exp.date}</p>
-                            </div>
-                            <p class="font-bold text-red-600">-${formatCurrency(exp.amount)}</p>
-                        `;
-                        list.appendChild(li);
-                    });
-                    desktopRecentTransactionsEl.appendChild(list);
-                } else {
-                    desktopRecentTransactionsEl.innerHTML = '<p class="text-gray-500">No recent transactions.</p>';
-                }
-            }
+            // Mobile
+            document.getElementById('summaryIncome').textContent = formatCurrency(thisMonthIncome);
+            document.getElementById('summaryExpenses').textContent = formatCurrency(thisMonthExpenses);
+            document.getElementById('summaryBalance').textContent = formatCurrency(thisMonthNet);
 
-            // Desktop Budgets
-            const desktopBudgetsEl = document.getElementById('desktopBudgets');
-            if (desktopBudgetsEl) {
-                desktopBudgetsEl.innerHTML = '';
-                const monthlyExpenses = expenses.filter(e => e.date.startsWith(currentMonthStr));
-                const allActiveSubs = subscriptions.filter(s => s.status === 'active');
-                
-                budgets.forEach(budget => {
-                    const actualSpend = monthlyExpenses.filter(e => e.category === budget.category && e.subcategory === budget.subcategory).reduce((sum, e) => sum + e.amount, 0);
-                    const percentage = budget.amount > 0 ? (actualSpend / budget.amount) * 100 : 0;
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <div class="flex justify-between mb-1">
-                            <span class="font-semibold">${budget.category} / ${budget.subcategory}</span>
-                            <span>${formatCurrency(actualSpend)} / ${formatCurrency(budget.amount)}</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div class="bg-green-600 h-2.5 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
-                        </div>
-                    `;
-                    desktopBudgetsEl.appendChild(div);
-                });
-
-                const subCost = allActiveSubs.reduce((sum, s) => sum + s.amount, 0);
-                 if (subCost > 0) {
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <div class="flex justify-between mb-1">
-                            <span class="font-semibold">Subscriptions</span>
-                            <span>${formatCurrency(subCost)}</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 100%"></div>
-                        </div>
-                    `;
-                    desktopBudgetsEl.appendChild(div);
-                }
-            }
+            // Desktop
+            document.getElementById('desktopBalance').textContent = formatCurrency(balance);
+            document.getElementById('desktopThisMonth').textContent = formatCurrency(thisMonthNet);
+            document.getElementById('desktopLastMonth').textContent = formatCurrency(lastMonthNet);
+            document.getElementById('desktopThisMonth').className = `text-2xl font-bold ${thisMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            document.getElementById('desktopLastMonth').className = `text-2xl font-bold ${lastMonthNet >= 0 ? 'text-green-600' : 'text-red-600'}`;
+        }
+        
+        async function updateDashboardSpendByCategory(allExpenses) {
+            const today = new Date();
+            const currentMonthStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+            const monthlyExpenses = allExpenses.filter(e => e.date.startsWith(currentMonthStr));
             
-            // Mobile Upcoming Expenses
-            const mobileUpcomingExpensesEl = document.getElementById('mobileUpcomingExpenses');
-            if (mobileUpcomingExpensesEl) {
-                 mobileUpcomingExpensesEl.innerHTML = '';
-                 const allActiveSubs = subscriptions.filter(s => s.status === 'active');
-                 const upcoming = [...budgets, ...allActiveSubs];
-                 if(upcoming.length > 0) {
-                    const list = document.createElement('ul');
-                    list.className = 'space-y-3';
-                    upcoming.forEach(item => {
-                        const li = document.createElement('li');
-                        li.className = 'flex justify-between items-center';
-                        li.innerHTML = `
-                            <div>
-                                <p class="font-semibold">${item.name || `${item.category} / ${item.subcategory}`}</p>
-                                <p class="text-sm text-gray-500">${item.paymentMethod || 'N/A'} - ${item.payType || 'Auto'}</p>
+            const spendByCategory = monthlyExpenses.reduce((acc, expense) => {
+                acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+                return acc;
+            }, {});
+
+            const totalSpend = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+            
+            const sortedCategories = Object.entries(spendByCategory).sort(([,a],[,b]) => b-a);
+
+            const renderContainer = (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = '';
+                if (sortedCategories.length > 0) {
+                    sortedCategories.forEach(([category, amount]) => {
+                        const percentage = totalSpend > 0 ? (amount / totalSpend) * 100 : 0;
+                        const div = document.createElement('div');
+                        div.innerHTML = `
+                            <div class="flex justify-between mb-1">
+                                <span class="font-semibold text-sm">${category}</span>
+                                <span class="text-sm">${formatCurrency(amount)}</span>
                             </div>
-                            <p class="font-bold">${formatCurrency(item.amount)}</p>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                            </div>
                         `;
-                        list.appendChild(li);
-                    });
-                    mobileUpcomingExpensesEl.appendChild(list);
-                 } else {
-                    mobileUpcomingExpensesEl.innerHTML = '<p class="text-gray-500">No upcoming expenses.</p>';
-                 }
-            }
-
-            // Upcoming Birthdays
-            const upcomingBirthdaysList = document.getElementById('upcomingBirthdays');
-            if (upcomingBirthdaysList) {
-                upcomingBirthdaysList.innerHTML = '';
-                const upcoming = people.filter(p => {
-                    const birthday = new Date(p.birthday);
-                    birthday.setFullYear(today.getFullYear());
-                    const diff = birthday.getTime() - today.getTime();
-                    return diff > 0 && diff < (30 * 24 * 60 * 60 * 1000); // within 30 days
-                }).sort((a,b) => new Date(a.birthday) - new Date(b.birthday));
-
-                if (upcoming.length > 0) {
-                    upcoming.forEach(p => {
-                        const li = document.createElement('li');
-                        li.textContent = `${p.name} on ${new Date(p.birthday).toLocaleDateString()}`;
-                        upcomingBirthdaysList.appendChild(li);
+                        container.appendChild(div);
                     });
                 } else {
-                    upcomingBirthdaysList.innerHTML = '<li>No upcoming birthdays in the next 30 days.</li>';
+                    container.innerHTML = '<p class="text-gray-500">No spending this month.</p>';
                 }
+            };
+            
+            renderContainer('desktopSpendByCategory');
+            renderContainer('mobileSpendByCategory');
+        }
+
+        function updateDashboardDesktopBudgets(budgets, subscriptions, expenses) {
+            const desktopBudgetsEl = document.getElementById('desktopBudgets');
+            if (!desktopBudgetsEl) return;
+            desktopBudgetsEl.innerHTML = '';
+
+            const today = new Date();
+            const currentMonthStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+            const monthlyExpenses = expenses.filter(e => e.date.startsWith(currentMonthStr));
+            const allActiveSubs = subscriptions.filter(s => s.status === 'active');
+            
+            budgets.forEach(budget => {
+                const actualSpend = monthlyExpenses.filter(e => e.category === budget.category && e.subcategory === budget.subcategory).reduce((sum, e) => sum + e.amount, 0);
+                const percentage = budget.amount > 0 ? (actualSpend / budget.amount) * 100 : 0;
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between mb-1">
+                        <span class="font-semibold">${budget.category} / ${budget.subcategory}</span>
+                        <span>${formatCurrency(actualSpend)} / ${formatCurrency(budget.amount)}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-green-600 h-2.5 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                    </div>
+                `;
+                desktopBudgetsEl.appendChild(div);
+            });
+
+            const subCost = allActiveSubs.reduce((sum, s) => sum + s.amount, 0);
+             if (subCost > 0) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between mb-1">
+                        <span class="font-semibold">Subscriptions</span>
+                        <span>${formatCurrency(subCost)}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 100%"></div>
+                    </div>
+                `;
+                desktopBudgetsEl.appendChild(div);
+            }
+        }
+        
+        function updateDashboardBirthdays(people) {
+             const upcomingBirthdaysList = document.getElementById('upcomingBirthdays');
+            if (!upcomingBirthdaysList) return;
+            upcomingBirthdaysList.innerHTML = '';
+            const today = new Date();
+            const upcoming = people.filter(p => {
+                if (!p.birthday) return false;
+                const birthday = new Date(p.birthday + 'T00:00:00');
+                birthday.setFullYear(today.getFullYear());
+                const diff = birthday.getTime() - today.getTime();
+                return diff > 0 && diff < (30 * 24 * 60 * 60 * 1000); // within 30 days
+            }).sort((a,b) => new Date(a.birthday) - new Date(b.birthday));
+
+            if (upcoming.length > 0) {
+                upcoming.forEach(p => {
+                    const li = document.createElement('li');
+                    const bday = new Date(p.birthday + 'T00:00:00');
+                    li.textContent = `${p.name} on ${bday.toLocaleDateString(undefined, {month: 'long', day: 'numeric'})}`;
+                    upcomingBirthdaysList.appendChild(li);
+                });
+            } else {
+                upcomingBirthdaysList.innerHTML = '<li>No upcoming birthdays in the next 30 days.</li>';
             }
         }
 
@@ -1627,8 +1806,22 @@
             });
             const totalMonthlyIncome = monthlyIncome.reduce((sum, i) => sum + i.amount, 0);
 
-            const totalMonthlyExpenses = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0) + totalSubscriptionCost;
-            const netBalance = totalMonthlyIncome - totalMonthlyExpenses;
+            let totalMonthlyExpenses = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+            let netBalance = 0;
+            
+            const selectedDate = new Date(reportMonthValue + '-02T00:00:00'); // Use day 2 to avoid timezone issues
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            // If viewing a future month, use budgeted amounts instead of actuals
+            if (selectedDate > today) {
+                const totalBudgeted = allBudgets.reduce((sum, b) => sum + b.amount, 0);
+                totalMonthlyExpenses = totalBudgeted + totalSubscriptionCost;
+            } else {
+                totalMonthlyExpenses += totalSubscriptionCost;
+            }
+            
+            netBalance = totalMonthlyIncome - totalMonthlyExpenses;
 
             // --- 1. Income vs. Expense Report ---
             incomeExpenseReportEl.innerHTML = `
@@ -1700,8 +1893,8 @@
                          <tr class="font-bold bg-gray-100">
                             <td class="border px-4 py-2" colspan="2">Total</td>
                             <td class="border px-4 py-2 text-right">${formatCurrency(totalBudgeted)}</td>
-                            <td class="border px-4 py-2 text-right">${formatCurrency(totalMonthlyExpenses)}</td>
-                            <td class="border px-4 py-2 text-right ${totalBudgeted - totalMonthlyExpenses >= 0 ? 'text-green-600' : 'text-red-600'}">${formatCurrency(totalBudgeted - totalMonthlyExpenses)}</td>
+                            <td class="border px-4 py-2 text-right">${formatCurrency(monthlyExpenses.reduce((s,e) => s + e.amount, 0) + totalSubscriptionCost)}</td>
+                            <td class="border px-4 py-2 text-right ${totalBudgeted - (monthlyExpenses.reduce((s,e) => s + e.amount, 0) + totalSubscriptionCost) >= 0 ? 'text-green-600' : 'text-red-600'}">${formatCurrency(totalBudgeted - (monthlyExpenses.reduce((s,e) => s + e.amount, 0) + totalSubscriptionCost))}</td>
                         </tr>
                     </tbody>
                 `;
