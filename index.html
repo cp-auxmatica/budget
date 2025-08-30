@@ -369,6 +369,7 @@
                                             <th class="py-2 px-4 text-left" data-sort="payType">Pay Type</th>
                                             <th class="py-2 px-4 text-right" data-sort="dueDay">Due Day</th>
                                             <th class="py-2 px-4 text-right" data-sort="amount">Amount</th>
+                                            <th class="py-2 px-4 text-center">Status</th>
                                             <th class="py-2 px-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
@@ -925,8 +926,11 @@
                 const id = document.getElementById('budgetId').value;
                 if(id){
                     budgetData.id = parseInt(id);
+                    const existingBudget = await getObject('budgets', budgetData.id);
+                    budgetData.paidMonths = existingBudget.paidMonths || [];
                     await updateObject('budgets', budgetData);
                 } else {
+                    budgetData.paidMonths = [];
                     await addObject('budgets', budgetData);
                 }
                 e.target.reset();
@@ -1204,10 +1208,27 @@
             const subscriptions = await getAllObjects('subscriptions');
             const list = document.getElementById('budgetList');
             list.innerHTML = '';
+            
+            const today = new Date();
+            const currentMonthStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
 
             // Render user-defined budgets
             budgets.forEach(budget => {
+                const isPaidThisMonth = budget.paidMonths && budget.paidMonths.includes(currentMonthStr);
                 const row = list.insertRow();
+                if(isPaidThisMonth){
+                    row.className = 'bg-green-50 text-gray-500 line-through';
+                }
+
+                let statusHTML;
+                if(isPaidThisMonth){
+                    statusHTML = `<button onclick="toggleBudgetPaidStatus(${budget.id})" class="text-sm text-green-700 font-semibold flex items-center justify-center w-full">
+                                    <i data-feather="check-circle" class="w-4 h-4 mr-1"></i> Paid
+                                 </button>`;
+                } else {
+                    statusHTML = `<button onclick="toggleBudgetPaidStatus(${budget.id})" class="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded-md hover:bg-gray-300">Mark Paid</button>`;
+                }
+
                 row.innerHTML = `
                     <td class="border px-4 py-2">${budget.category}</td>
                     <td class="border px-4 py-2">${budget.subcategory}</td>
@@ -1215,6 +1236,7 @@
                     <td class="border px-4 py-2">${budget.payType || 'Manual'}</td>
                     <td class="border px-4 py-2 text-right">${budget.dueDay || 'N/A'}</td>
                     <td class="border px-4 py-2 text-right">${formatCurrency(budget.amount)}</td>
+                    <td class="border px-4 py-2 text-center">${statusHTML}</td>
                     <td class="border px-4 py-2 text-center">
                         <button onclick="editBudget(${budget.id})" class="text-blue-500 hover:underline">Edit</button>
                         <button onclick="deleteBudget(${budget.id})" class="text-red-500 hover:underline ml-2">Delete</button>
@@ -1228,7 +1250,7 @@
 
             if (totalSubscriptionCost > 0) {
                 const row = list.insertRow();
-                row.className = 'bg-blue-50'; // Add a distinct style
+                row.className = 'bg-blue-50 text-gray-600';
                 row.innerHTML = `
                     <td class="border px-4 py-2 font-semibold">Subscriptions</td>
                     <td class="border px-4 py-2">Recurring</td>
@@ -1236,10 +1258,12 @@
                     <td class="border px-4 py-2">Auto</td>
                     <td class="border px-4 py-2 text-right">Varies</td>
                     <td class="border px-4 py-2 text-right">${formatCurrency(totalSubscriptionCost)}</td>
+                    <td class="border px-4 py-2 text-center text-sm font-semibold text-green-700">Paid (Auto)</td>
                     <td class="border px-4 py-2 text-center text-sm text-gray-500">Auto</td>
                 `;
             }
             await updateBudgetSummary();
+            feather.replace();
         }
         
         async function editBudget(id) {
@@ -1264,6 +1288,33 @@
                 loadBudgets();
                 showNotification('Budget deleted.');
             });
+        }
+        
+        async function toggleBudgetPaidStatus(id) {
+            const budget = await getObject('budgets', id);
+            if (!budget) return;
+
+            const today = new Date();
+            const currentMonthStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            if (!budget.paidMonths) {
+                budget.paidMonths = [];
+            }
+            
+            const paidIndex = budget.paidMonths.indexOf(currentMonthStr);
+
+            if (paidIndex > -1) {
+                // It's paid, so un-pay it
+                budget.paidMonths.splice(paidIndex, 1);
+                showNotification('Status updated to unpaid.');
+            } else {
+                // It's not paid, so pay it
+                budget.paidMonths.push(currentMonthStr);
+                showNotification('Marked as paid for this month.');
+            }
+
+            await updateObject('budgets', budget);
+            await loadBudgets(); // Refresh the view
         }
         
         async function loadPaymentMethods() {
